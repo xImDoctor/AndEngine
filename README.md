@@ -1,6 +1,7 @@
 # AndEngine
 This is a lightweight `2.5D` (*pseudo-3D*) game engine inspired by really old (classic!) games like Doom. The engine uses raycasting techniques to create pseudo-3D environments from 2D maps, providing an authentic retro gaming experience.
 
+Current stage:
 ![Renderer Current Stage Preview](demo-img/MapRenderer.gif)
 
 ## Сontent
