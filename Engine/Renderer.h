@@ -16,7 +16,7 @@
 struct coord_t {
 	int x, y;
 
-
+public:
 	// overload for == operator to use coord_t directly in the conditions
 	friend bool operator==(const coord_t& coords1, const coord_t& coords2) {
 		if (coords1.x == coords2.x && coords1.y == coords2.y)
@@ -34,15 +34,16 @@ struct coord_t {
 struct fcoord_t {
 	float x, y;
 
+public:
 	// overload for == operator to use coord_t directly in the conditions
-	friend bool operator==(const coord_t& coords1, const coord_t& coords2) {
+	friend bool operator==(const fcoord_t& coords1, const fcoord_t& coords2) {
 		if (coords1.x == coords2.x && coords1.y == coords2.y)
 			return true;
 
 		return false;
 	}
 
-	friend bool operator!=(const coord_t& coords1, const coord_t& coords2) {
+	friend bool operator!=(const fcoord_t& coords1, const fcoord_t& coords2) {
 		return !(coords1 == coords2);
 	}
 };
@@ -103,6 +104,9 @@ class Renderer {
 public:
 
 	Renderer() {
+
+		playerCoord = { 2.0f, 2.0f };
+		playerAngle = 0.0f;
 
 		hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 		SetConsoleActiveScreenBuffer(hConsole);
