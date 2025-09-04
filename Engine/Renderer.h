@@ -7,6 +7,7 @@
 #include <ctime>
 #include <cmath>
 
+#include <cstdio>
 #include <iostream>
 
 // simplified (shorten Pi defined), not const from math.h
@@ -263,11 +264,57 @@ public:
 
 		// another renderable things here
 
+		renderPlayerInfo();
+		renderMiniMap();
 		
 
 		// draw final buffer to the screen (render -> screen)
 		SMALL_RECT writeRegion = { 0, 0, RENDER_WIDTH - 1, RENDER_HEIGHT - 1 };
 		WriteConsoleOutput(hConsole, screen, { RENDER_WIDTH, RENDER_HEIGHT }, { 0, 0 }, &writeRegion);
+	}
+
+	void renderPlayerInfo() {
+
+		char infoBuf[64];
+
+		sprintf_s(infoBuf, "X:%.2f Y:%0.2f Angle:%0.2f", playerCoord.x, playerCoord.y, playerAngle);
+
+		for (int i = 0; i < strlen(infoBuf) && i < RENDER_WIDTH; ++i) {
+			screen[i].Char.AsciiChar = infoBuf[i];
+			screen[i].Attributes = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+		}
+	}
+
+	void renderMiniMap() {
+		int miniMapSize = 16;	// but would be better to scale of real map sizes
+
+		coord_t offset = { RENDER_WIDTH - miniMapSize - 1, 1 };
+
+		for (int y = 0; y < MAP_HEIGHT && y < miniMapSize; y++)
+			for (int x = 0; x < MAP_WIDTH && x < miniMapSize; x++) {
+				int screenX = offset.x + x;
+				int screenY = offset.y + y;
+
+				int screenIndex = screenY * RENDER_WIDTH + screenX;	// scale with render width
+
+				if (screenX >= 0 && screenX < RENDER_WIDTH && screenY >= 0 && screenY < RENDER_HEIGHT) {
+
+					screen[screenIndex].Char.AsciiChar = map[y][x];
+
+					if (map[y][x] == '#') 
+						screen[screenIndex].Attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+					else 
+						screen[screenIndex].Attributes = FOREGROUND_BLUE;
+					
+
+					// player pos
+					if ((int)playerCoord.x == x && (int)playerCoord.y == y) {
+						screen[screenIndex].Char.AsciiChar = '@';
+						screen[screenIndex].Attributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
+					}
+				}
+			}
+		
 	}
 
 	// render (game right now) runing
