@@ -127,8 +127,8 @@ namespace RenderObjects {
 class Renderer {
 
 	// render window size
-	static const int RENDER_HEIGHT = 80;
-	static const int RENDER_WIDTH = 160;
+	static const int RENDER_HEIGHT = 60;
+	static const int RENDER_WIDTH = 280;
 
 	// array size
 	static const int MAP_HEIGHT = 16;
@@ -269,7 +269,9 @@ public:
 		//	screen[i].Char.AsciiChar = ' ';
 		//	screen[i].Attributes = 0;
 		//}
-		clearScreen();
+		clearScreen();	// now clears just str buffer
+		// removed cls
+		// system("cls");
 
 		// render every col on the screen to make walls
 		for (int x = 0; x < RENDER_WIDTH; ++x) {
@@ -392,6 +394,7 @@ public:
 	void run() {
 		bool isRunning = true;
 
+		system("cls");	// clear window before game drawing
 		while (isRunning) {
 			
 			handleInput();
@@ -424,7 +427,7 @@ private:
 		for (auto& line : screenBuffer)
 			std::fill(line.begin(), line.end(), ' ');
 
-		system("cls");	// clear console
+		//system("cls");	// clear console
 	}
 
 
@@ -474,7 +477,10 @@ private:
 			}
 
 		}
+
 		SET_DEFAULT_COLOR;
+		// removed cls so flush out buffer directly
+		std::cout.flush();
 	}
 
 	std::vector<std::vector<char>> generateMap() {
