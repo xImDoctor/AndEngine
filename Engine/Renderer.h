@@ -146,6 +146,9 @@ class Renderer {
 	float fov = rendPI / 4.0f;		// field of view, pi/4
 	float depth = 16.0f;			// max render distance
 
+	// player speed
+	float movementSpeed = 0.1f;
+	float rotationSpeed = 0.3f;
 
 	// console
 	//HANDLE hConsole;
@@ -529,8 +532,6 @@ private:
 
 	void handleInput() {
 
-		float movementSpeed = 0.1f;
-		float rotationSpeed = 0.1f;
 
 		// rotate to A-D
 		// move forward-backward to W-S
