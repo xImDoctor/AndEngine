@@ -1,7 +1,10 @@
 #pragma once
 
 #include <Windows.h>
+
 #include <vector>
+#include <string>
+#include <algorithm> // fill
 
 #include <cstdlib>
 #include <ctime>
@@ -16,6 +19,12 @@
 // todo: move map creation to Game class (but right now it is simplified)
 // todo: choose drawing color for wall based on its disntace - getWallColor
 // HAVE TO DO A LOT OF REFACTORING!
+
+
+// color defines from my snake project
+#define SET_DEFAULT_COLOR RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
+#define YELLOW_COLOR FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY
+#define MAGENTA FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY
 
 
 struct coord_t {
@@ -51,6 +60,31 @@ struct fcoord_t {
 	}
 };
 
+namespace RenderUtils {
+	
+	void MoveToXY(int x, int y) {
+
+		COORD pos = { static_cast<SHORT>(x), static_cast<SHORT>(y)};
+
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleCursorPosition(output, pos);
+	}
+
+	void MoveToXY(const coord_t& coords) {
+
+		COORD pos = { static_cast<SHORT>(coords.x), static_cast<SHORT>(coords.y) };
+
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleCursorPosition(output, pos);
+	}
+
+	void SetTextColor(int color) {
+
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, color);
+	}
+
+}
 
 namespace RenderObjects {
 
@@ -93,12 +127,14 @@ namespace RenderObjects {
 class Renderer {
 
 	// render window size
-	static const int RENDER_HEIGHT = 120;
-	static const int RENDER_WIDTH = 40;
+	static const int RENDER_HEIGHT = 80;
+	static const int RENDER_WIDTH = 160;
 
 	// array size
 	static const int MAP_HEIGHT = 16;
 	static const int MAP_WIDTH = 16;
+
+	static const int RENDER_DELAY = 100;	// ms
 
 	// array to store game map
 	std::vector<std::vector<char>> map;		// MAP_HEIGHT x MAP_WIDTH
@@ -112,8 +148,11 @@ class Renderer {
 
 
 	// console
-	HANDLE hConsole;
-	CHAR_INFO* screen;
+	//HANDLE hConsole;
+	//CHAR_INFO* screen;
+
+	// use string as simple console buffer
+	std::vector<std::string> screenBuffer;
 
 public:
 
@@ -124,12 +163,18 @@ public:
 		playerCoord = { 2.0f, 2.0f };
 		playerAngle = 0.0f;
 
-		hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-		SetConsoleActiveScreenBuffer(hConsole);
+		screenBuffer.resize(RENDER_HEIGHT);	// vector size, not string one
+		for (auto& line : screenBuffer)
+			line.resize(RENDER_WIDTH, ' '); // resize and clear strings
 
-		screen = new CHAR_INFO[RENDER_HEIGHT * RENDER_WIDTH];
+
+		//hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
+		//SetConsoleActiveScreenBuffer(hConsole);
+		//screen = new CHAR_INFO[RENDER_HEIGHT * RENDER_WIDTH];
 		
+		// hide cursor when console is active
 		CONSOLE_CURSOR_INFO cursorInfo;
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 		GetConsoleCursorInfo(hConsole, &cursorInfo);
 		cursorInfo.bVisible = false;
 		SetConsoleCursorInfo(hConsole, &cursorInfo);
@@ -138,13 +183,14 @@ public:
 
 	}
 
-	~Renderer() {
-		delete[] screen;
-		CloseHandle(hConsole);
-	}
+	//~Renderer() {
+	//	delete[] screen;
+	//	CloseHandle(hConsole);
+	//}
+	~Renderer() = default;
 
 
-	// show created/choosen map
+	// show created/choosen map (for debug, not for player)
 	void renderMap() const {
 
 		for (const auto& row : map) {
@@ -219,10 +265,11 @@ public:
 	void render() {
 
 		// clear screen
-		for (int i = 0; i < RENDER_WIDTH * RENDER_HEIGHT; ++i) {
-			screen[i].Char.AsciiChar = ' ';
-			screen[i].Attributes = 0;
-		}
+		//for (int i = 0; i < RENDER_WIDTH * RENDER_HEIGHT; ++i) {
+		//	screen[i].Char.AsciiChar = ' ';
+		//	screen[i].Attributes = 0;
+		//}
+		clearScreen();
 
 		// render every col on the screen to make walls
 		for (int x = 0; x < RENDER_WIDTH; ++x) {
@@ -247,41 +294,51 @@ public:
 				int screenIndex = y * RENDER_WIDTH + x;	// scale coord to screen size
 
 				if (y < wallTop) {												// upper the wall
-					screen[screenIndex].Char.AsciiChar = RenderObjects::PATH;
+					//screen[screenIndex].Char.AsciiChar = RenderObjects::PATH;
 					//screen[screenIndex].Attributes = BACKGROUND_BLUE >> 1; // set color
+					screenBuffer[y][x] = RenderObjects::PATH;
 				}
 				else if (y >= wallTop && y <= wallBottom) {						// in-wall
-					screen[screenIndex].Char.AsciiChar = getWallSymb(distance);
+					//screen[screenIndex].Char.AsciiChar = getWallSymb(distance);
 					//screen[screenIndex].Attributes = getWallColor(distance);
+					screenBuffer[y][x] = getWallSymb(distance);
 				}
 				else {															// under the wall
-					screen[screenIndex].Char.AsciiChar = RenderObjects::PATH;
+					//screen[screenIndex].Char.AsciiChar = RenderObjects::PATH;
 					//screen[screenIndex].Attributes = BACKGROUND_GREEN >> 1;
+					screenBuffer[y][x] = RenderObjects::PATH;
 				}
 			}
 
 		}
 
 		// another renderable things here
-
 		renderPlayerInfo();
 		renderMiniMap();
-		
 
 		// draw final buffer to the screen (render -> screen)
-		SMALL_RECT writeRegion = { 0, 0, RENDER_WIDTH - 1, RENDER_HEIGHT - 1 };
-		WriteConsoleOutput(hConsole, screen, { RENDER_WIDTH, RENDER_HEIGHT }, { 0, 0 }, &writeRegion);
+		displayScreen();
+
+		// old one
+		//SMALL_RECT writeRegion = { 0, 0, RENDER_WIDTH - 1, RENDER_HEIGHT - 1 };
+		//WriteConsoleOutput(hConsole, screen, { RENDER_WIDTH, RENDER_HEIGHT }, { 0, 0 }, &writeRegion);
+
 	}
 
 	void renderPlayerInfo() {
 
 		char infoBuf[64];
+		sprintf_s(infoBuf, "X:%.2f Y:%0.2f Angle:%0.2f", playerCoord.x, playerCoord.y, playerAngle);	// setup buffer
 
-		sprintf_s(infoBuf, "X:%.2f Y:%0.2f Angle:%0.2f", playerCoord.x, playerCoord.y, playerAngle);
+		std::string info = infoBuf;
+		if (info.length() > RENDER_WIDTH) info.resize(RENDER_WIDTH);
 
 		for (int i = 0; i < strlen(infoBuf) && i < RENDER_WIDTH; ++i) {
-			screen[i].Char.AsciiChar = infoBuf[i];
-			screen[i].Attributes = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+			screenBuffer[0][i] = info[i];
+
+
+			//screen[i].Char.AsciiChar = infoBuf[i];
+			//screen[i].Attributes = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
 		}
 	}
 
@@ -289,32 +346,46 @@ public:
 		int miniMapSize = 16;	// but would be better to scale of real map sizes
 
 		coord_t offset = { RENDER_WIDTH - miniMapSize - 1, 1 };
+		
+		// minimap border
+		for (int i = 0; i < miniMapSize + 2; ++i)
+			if (offset.y + i >= 0 && offset.y + i < RENDER_HEIGHT) {
 
-		for (int y = 0; y < MAP_HEIGHT && y < miniMapSize; y++)
-			for (int x = 0; x < MAP_WIDTH && x < miniMapSize; x++) {
+				if (offset.x - 1 >= 0) 
+					screenBuffer[offset.y + i][offset.x - 1] = '|';
+
+				if (offset.x + miniMapSize < RENDER_WIDTH)
+					screenBuffer[offset.y + i][offset.x + miniMapSize] = '|';
+			}
+		
+
+		for (int i = -1; i <= miniMapSize; ++i)
+			if (offset.x + i >= 0 && offset.x + i < RENDER_WIDTH) {
+
+				if (offset.y - 1 >= 0) 
+					screenBuffer[offset.y - 1][offset.x + i] = '-';
+
+				if (offset.y + miniMapSize < RENDER_HEIGHT)
+					screenBuffer[offset.y + miniMapSize][offset.x + i] = '_';
+			}
+		
+		// info inside of minimap
+		for (int y = 0; y < MAP_HEIGHT && y < miniMapSize; ++y)
+			for (int x = 0; x < MAP_WIDTH && x < miniMapSize; ++x) {
+
 				int screenX = offset.x + x;
 				int screenY = offset.y + y;
 
-				int screenIndex = screenY * RENDER_WIDTH + screenX;	// scale with render width
-
 				if (screenX >= 0 && screenX < RENDER_WIDTH && screenY >= 0 && screenY < RENDER_HEIGHT) {
 
-					screen[screenIndex].Char.AsciiChar = map[y][x];
-
-					if (map[y][x] == '#') 
-						screen[screenIndex].Attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-					else 
-						screen[screenIndex].Attributes = FOREGROUND_BLUE;
-					
+					screenBuffer[screenY][screenX] = map[y][x];
 
 					// player pos
-					if ((int)playerCoord.x == x && (int)playerCoord.y == y) {
-						screen[screenIndex].Char.AsciiChar = '@';
-						screen[screenIndex].Attributes = FOREGROUND_RED | FOREGROUND_INTENSITY;
-					}
+					if ((int)playerCoord.x == x && (int)playerCoord.y == y)
+						screenBuffer[screenY][screenX] = '@';
 				}
 			}
-		
+
 	}
 
 	// render (game right now) runing
@@ -330,7 +401,10 @@ public:
 			// stop render when Esc pressed
 			if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) isRunning = false;
 
-			Sleep(16); // 16 ms ~60 FPS, delay to stabilize frames
+			//Sleep(16); // 16 ms ~60 FPS, delay to stabilize frames
+			
+			// sleep time increased because of another displaying method 
+			Sleep(RENDER_DELAY);
 		}
 
 	}
@@ -345,6 +419,63 @@ private:
 		while (angle >= 2 * rendPI) angle -= 2 * rendPI;
 	}
 
+	void clearScreen() {
+		// clear buffer
+		for (auto& line : screenBuffer)
+			std::fill(line.begin(), line.end(), ' ');
+
+		system("cls");	// clear console
+	}
+
+
+	// display buffer through console output and also define elements colors
+	void displayScreen() {
+		//for (const auto& line : screenBuffer)
+		//	std::cout << line << '\n';			// no need in the std::endl that resets default console buffer when called
+
+		RenderUtils::MoveToXY(0, 0);
+		for (int y = 0; y < RENDER_HEIGHT; ++y) {
+			RenderUtils::MoveToXY(0, y);		// move to start of every Y line
+
+			for (int x = 0; x < RENDER_WIDTH; ++x) {
+				
+				char symb = screenBuffer[y][x];
+
+				// choose colors for symbols
+				switch (symb) {
+
+				// in-screen walls displaying colors
+				case '#':
+					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+					break;
+				case 'X':
+					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+					break;
+				case 'x':
+					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN);
+					break;
+				case '.':
+					RenderUtils::SetTextColor(FOREGROUND_RED);
+					break;
+				case '@':
+					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+					break;
+				default:
+					SET_DEFAULT_COLOR;
+					break;
+				}
+
+				if (!y) // zero-line, player info
+					RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+
+				// display symbol after coloring
+				std::cout << symb;
+
+			}
+
+		}
+		SET_DEFAULT_COLOR;
+	}
 
 	std::vector<std::vector<char>> generateMap() {
 
