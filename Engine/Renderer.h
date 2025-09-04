@@ -10,6 +10,7 @@
 
 // todo: move map creation to Game class (but right now it is simplified)
 // todo: choose drawing color for wall based on its disntace - getWallColor
+// HAVE TO DO A LOT OF REFACTORING!
 
 
 struct coord_t {
@@ -243,9 +244,30 @@ public:
 
 		// another renderable things here
 
+		
+
+		// draw final buffer to the screen (render -> screen)
+		SMALL_RECT writeRegion = { 0, 0, RENDER_WIDTH - 1, RENDER_HEIGHT - 1 };
+		WriteConsoleOutput(hConsole, screen, { RENDER_WIDTH, RENDER_HEIGHT }, { 0, 0 }, &writeRegion);
 	}
 
+	// render (game right now) runing
+	void run() {
+		bool isRunning = true;
 
+		while (isRunning) {
+			
+			handleInput();
+			
+			render();
+
+			// stop render when Esc pressed
+			if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) isRunning = false;
+
+			Sleep(16); // 16 ms ~60 FPS, delay to stabilize frames
+		}
+
+	}
 
 
 	// class utils
