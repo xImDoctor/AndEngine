@@ -2,8 +2,11 @@
 
 #include <Windows.h>
 #include <vector>
+
 #include <cstdlib>
+#include <ctime>
 #include <cmath>
+
 #include <iostream>
 
 // simplified (shorten Pi defined), not const from math.h
@@ -58,27 +61,30 @@ namespace RenderObjects {
 
 	};
 
-	// spawn wall if taken coords == random coords width got from area
-	// use srand() on the game initialization, this is not the task of Renderer
-	// todo: move map creation to Game class (but right now it is simplified)
-	bool isWallSpawnable(const coord_t& coords, const int areaHeight, const int areaWidth) {
-		
-		coord_t spawnCoords;
-		spawnCoords.x = rand() % areaHeight;
-		spawnCoords.y = rand() % areaWidth;
+	namespace Utils {
 
-		if (coords == spawnCoords)
-			return true;
+		// spawn wall if taken coords == random coords width got from area
+		// use srand() on the game initialization, this is not the task of Renderer
+		// todo: move map creation to Game class (but right now it is simplified)
+		bool isWallSpawnable(const coord_t& coords, const int areaHeight, const int areaWidth) {
 
-		return false;
-	}
+			coord_t spawnCoords;
+			spawnCoords.x = rand() % areaHeight;
+			spawnCoords.y = rand() % areaWidth;
 
-	bool isWallPercentSpawnable(const coord_t& coords, int spawnPercent = 40) {
-	
-		if ((rand() % 100 + 1) <= spawnPercent)
-			return true;
+			if (coords == spawnCoords)
+				return true;
 
-		return false;
+			return false;
+		}
+
+		bool isWallPercentSpawnable(const coord_t& coords, int spawnPercent = 40) {
+
+			if ((rand() % 100 + 1) <= spawnPercent)
+				return true;
+
+			return false;
+		}
 	}
 }
 
@@ -111,6 +117,8 @@ class Renderer {
 public:
 
 	Renderer() {
+
+		srand(static_cast<unsigned int>(time(NULL)));
 
 		playerCoord = { 2.0f, 2.0f };
 		playerAngle = 0.0f;
@@ -179,7 +187,7 @@ public:
 			else {
 				// check if wall is hit
 				coord_t mapCoord = { (int)rayCoord.x, (int)rayCoord.y };
-				if (map[mapCoord.x][mapCoord.y] == RenderObjects::WALL)
+				if (map[mapCoord.y][mapCoord.x] == RenderObjects::WALL)
 					isWallHit = true;
 			}
 
@@ -325,7 +333,7 @@ private:
 				coord_t spawnCoords = { i , j };
 
 				//if (RenderObjects::isWallSpawnable(spawnCoords, MAP_HEIGHT, MAP_WIDTH))
-				if (RenderObjects::isWallPercentSpawnable(spawnCoords, 30))		// 40% by default
+				if (RenderObjects::Utils::isWallPercentSpawnable(spawnCoords, 30))		// 40% by default
 					newMap[i][j] = RenderObjects::WALL;
 			}
 
@@ -361,7 +369,7 @@ private:
 				newPlayerCoord.y = playerCoord.y - sinf(playerAngle) * movementSpeed;
 			}
 
-			if (map[(int)newPlayerCoord.x][(int)newPlayerCoord.y] == RenderObjects::PATH)
+			if (map[(int)newPlayerCoord.y][(int)newPlayerCoord.x] == RenderObjects::PATH)
 				playerCoord = newPlayerCoord;
 
 			normalizeAngle(playerAngle);

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstdlib>
-#include <ctime>
 
 // proj libs
 #include "Engine/Renderer.h"
@@ -9,13 +8,13 @@
 int main() {
 
 	//setlocale(0, "rus");
-	srand(static_cast<unsigned int>(time(NULL)));
+	system("mode con: cols=120 lines=40");
 
 	Renderer gameRenderer;
 
 	gameRenderer.renderMap();
 	//gameRenderer.run();
 
-	system("pause>nul");
+	system("pause>nul");		// Renderer changes console context that conficts with standard one causing start error... WOW
 	return 0;
 }
