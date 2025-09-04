@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdlib>
 #include <cmath>
+#include <iostream>
 
 // simplified (shorten Pi defined), not const from math.h
 #define rendPI 3.14159f
@@ -16,7 +17,6 @@
 struct coord_t {
 	int x, y;
 
-public:
 	// overload for == operator to use coord_t directly in the conditions
 	friend bool operator==(const coord_t& coords1, const coord_t& coords2) {
 		if (coords1.x == coords2.x && coords1.y == coords2.y)
@@ -34,8 +34,7 @@ public:
 struct fcoord_t {
 	float x, y;
 
-public:
-	// overload for == operator to use coord_t directly in the conditions
+	// overload for == operator to use fcoord_t directly in the conditions
 	friend bool operator==(const fcoord_t& coords1, const fcoord_t& coords2) {
 		if (coords1.x == coords2.x && coords1.y == coords2.y)
 			return true;
@@ -69,6 +68,14 @@ namespace RenderObjects {
 		spawnCoords.y = rand() % areaWidth;
 
 		if (coords == spawnCoords)
+			return true;
+
+		return false;
+	}
+
+	bool isWallPercentSpawnable(const coord_t& coords, int spawnPercent = 40) {
+	
+		if ((rand() % 100 + 1) <= spawnPercent)
 			return true;
 
 		return false;
@@ -129,11 +136,15 @@ public:
 
 
 	// show created/choosen map
-	void RenderMap() const {
+	void renderMap() const {
 
 		for (const auto& row : map) {
-			for (const auto& cell : row)
-				std::cout << cell;
+			for (const auto& cell : row) {
+
+				if (cell == RenderObjects::WALL)
+					std::cout << '#';
+				else std::cout << ' ';
+			}
 			
 			std::cout << std::endl;
 		}
@@ -228,7 +239,7 @@ public:
 			int wallBottom = (RENDER_HEIGHT / 2) + (wallHeight / 2); 		// the same logic but width bottom point
 
 			for (int y = 0; y < RENDER_HEIGHT; ++y) {
-				int screenIndex = y * RENDER_WIDTH;	// scale coord to screen size
+				int screenIndex = y * RENDER_WIDTH + x;	// scale coord to screen size
 
 				if (y < wallTop) {												// upper the wall
 					screen[screenIndex].Char.AsciiChar = RenderObjects::PATH;
@@ -283,9 +294,11 @@ private:
 		while (angle >= 2 * rendPI) angle -= 2 * rendPI;
 	}
 
-	std::vector<std::vector<char>>& generateMap() {
 
-		std::vector<std::vector<char>> newMap;
+	std::vector<std::vector<char>> generateMap() {
+
+		std::vector<std::vector<char>> newMap(MAP_HEIGHT, std::vector<char>(MAP_WIDTH));
+
 		//char** newMap = new char* [MAP_HEIGHT];
 
 		for (int i = 0; i < MAP_HEIGHT; ++i) {
@@ -294,37 +307,33 @@ private:
 
 			for (int j = 0; j < MAP_WIDTH; ++j) {
 
-				if (!i || !j || j == MAP_WIDTH - 1 || i < MAP_HEIGHT - 1) {
+				if (!i || !j || j == MAP_WIDTH - 1 || i == MAP_HEIGHT - 1) {
 
-					//newMap[i][j] == RenderObjects::WALL;
-					newMap[i].push_back(RenderObjects::WALL);
-					continue;
+					//newMap[i].push_back(RenderObjects::WALL);
+					
+					// coz dimentions are presized now
+					newMap[i][j] = RenderObjects::WALL;
 				}
-
-				//newMap[i][j] == RenderObjects::PATH;
-				newMap[i].push_back(RenderObjects::PATH);
+				else {
+					newMap[i][j] = RenderObjects::PATH;
+					//newMap[i].push_back(RenderObjects::PATH);
+				}
 			}
 		}
 
-		coord_t coords = { 2, 1 };	// border is already made, first cell also recuired for player spawn right now
+		coord_t coords = { 2, 2 };	// border is already made, and second cell used for player spawn right now
 
-		while (coords.x < MAP_WIDTH - 1 && coords.y < MAP_HEIGHT - 1) {
+		// randomly spawn walls
+		for (int i = coords.x; i < MAP_HEIGHT - 2; ++i)
+			for (int j = coords.y; j < MAP_WIDTH - 2; ++j) {
+				coord_t spawnCoords = { i , j };
 
-			if (RenderObjects::isWallSpawnable(coords, MAP_HEIGHT, MAP_WIDTH))
-				newMap[coords.x][coords.y] = RenderObjects::WALL;
-
-			// move coords
-			if (coords.x == MAP_WIDTH - 1)
-				++coords.y;
-			else if (coords.y == MAP_HEIGHT - 1)
-				++coords.x;
-			else {
-				if (rand() % 2)
-					++coords.x;
-				else
-					++coords.y;
+				//if (RenderObjects::isWallSpawnable(spawnCoords, MAP_HEIGHT, MAP_WIDTH))
+				if (RenderObjects::isWallPercentSpawnable(spawnCoords, 30))		// 40% by default
+					newMap[i][j] = RenderObjects::WALL;
 			}
-		}
+
+		newMap[coords.x][coords.y] = RenderObjects::PATH;
 
 		return newMap;
 	}
@@ -343,7 +352,7 @@ private:
 			playerAngle += rotationSpeed;
 		else {
 
-			fcoord_t newPlayerCoord;
+			fcoord_t newPlayerCoord = playerCoord;
 
 			if (GetAsyncKeyState('W') & 0x8000) {
 
