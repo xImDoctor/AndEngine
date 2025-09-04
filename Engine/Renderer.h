@@ -50,7 +50,7 @@ struct fcoord_t {
 
 namespace RenderObjects {
 
-	enum objectTypes { PATH, WALL };
+	enum objectTypes { PATH = ' ', WALL = '#' };
 
 
 	// to make material and other params for objects (empty for now)
@@ -139,12 +139,8 @@ public:
 	void renderMap() const {
 
 		for (const auto& row : map) {
-			for (const auto& cell : row) {
-
-				if (cell == RenderObjects::WALL)
-					std::cout << '#';
-				else std::cout << ' ';
-			}
+			for (const auto cell : row)
+				std::cout << cell;
 			
 			std::cout << std::endl;
 		}
