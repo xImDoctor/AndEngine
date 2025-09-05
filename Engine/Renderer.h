@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <cctype>	// ctype.h
 
 #include <cstdio>
 #include <iostream>
@@ -251,8 +252,10 @@ public:
 	char getWallSymb(float distance) {
 
 		if (distance <= depth / 4.0f) return '#';		// too short
-		else if (distance <= depth / 3.0f) return 'X';
-		else if (distance <= depth / 2.0f) return 'x';
+		else if (distance <= depth / 3.5f) return 'X';
+		else if (distance <= depth / 3.0f) return 'O';
+		else if (distance <= depth / 2.5f) return 'x';
+		else if (distance <= depth / 2.0f) return '-';
 		else if (distance <= depth)	return '.';			// too far
 		 
 		return ' '; // nothing in the view
@@ -450,29 +453,41 @@ private:
 				// choose colors for symbols
 				switch (symb) {
 
-				// in-screen walls displaying colors
+					// in-screen walls displaying colors
 				case '#':
 					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 					break;
 				case 'X':
-					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+					if (!y)	// if this is X axis in the info label
+						RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+					else // 'X' as wall symbol
+						RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 					break;
-				case 'x':
+				case 'O':
 					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN);
 					break;
+				case 'x':
+					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_BLUE);
+					break;
+				case '-':
+					RenderUtils::SetTextColor(FOREGROUND_BLUE);
+					break;
 				case '.':
-					RenderUtils::SetTextColor(FOREGROUND_RED);
+					SET_DEFAULT_COLOR;
 					break;
 				case '@':
 					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
 					break;
 				default:
-					SET_DEFAULT_COLOR;
+
+					if (isalpha(symb) || isdigit(symb))		// zero-line player info, recolor only text/nums
+						RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+					else SET_DEFAULT_COLOR;
 					break;
 				}
 
-				if (!y) // zero-line, player info
-					RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+				//if (!y) // zero-line, player info
+				//	RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 
 				// display symbol after coloring
 				std::cout << symb;
