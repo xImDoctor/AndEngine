@@ -14,24 +14,24 @@
 #include <cstdio>
 #include <iostream>
 
-// simplified (shorten Pi defined), not const from math.h
-#define rendPI 3.14159f
-namespace RenderConst {
-	namespace Math {
-		static constexpr float Pi = 3.1415926535f;
 
+
+namespace RenderConst {
+
+	// simplified (shorten) Pi pre-defined, not const from math.h
+	// also other values with Pi radian
+	namespace Math {
+		static constexpr float PI = 3.1415926535f;		// Pi
+		static constexpr float TWO_PI = PI * 2.0f;		// 2Pi
+		static constexpr float HALF_PI = PI * 0.5f;		// Pi/2
+		static constexpr float QUART_PI = PI * 0.25f;	// Pi/4
 	}
 }
 
+// also:
 // todo: move map creation to Game class (but right now it is simplified)
 // todo: choose drawing color for wall based on its disntace - getWallColor
 // HAVE TO DO A LOT OF REFACTORING!
-
-
-// color defines from my snake project
-#define SET_DEFAULT_COLOR RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
-#define YELLOW_COLOR FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY
-#define MAGENTA FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY
 
 
 struct coord_t {
@@ -60,57 +60,81 @@ struct fcoord_t {
 	}
 };
 
-namespace RenderUtils {
-	
-	void MoveToXY(int x, int y) {
 
-		COORD pos = { static_cast<SHORT>(x), static_cast<SHORT>(y)};
+namespace Render {
 
-		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleCursorPosition(output, pos);
+	namespace Utils {
+
+		void MoveToXY(int x, int y) {
+
+			COORD pos = { static_cast<SHORT>(x), static_cast<SHORT>(y) };
+
+			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleCursorPosition(output, pos);
+		}
+
+		void MoveToXY(const coord_t& coords) {
+
+			COORD pos = { static_cast<SHORT>(coords.x), static_cast<SHORT>(coords.y) };
+
+			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleCursorPosition(output, pos);
+		}
+
+		void SetTextColor(int color) {
+
+			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+			SetConsoleTextAttribute(hConsole, color);
+		}
+
+		// set default color inline function instead of pre-defined macro
+		inline void setDefaultColor() {
+			Utils::SetTextColor(Objects::Colors::Default);
+		}
 	}
 
-	void MoveToXY(const coord_t& coords) {
+	namespace Objects {
 
-		COORD pos = { static_cast<SHORT>(coords.x), static_cast<SHORT>(coords.y) };
+		enum objectTypes { PATH = ' ', WALL = '#' };
 
-		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleCursorPosition(output, pos);
-	}
 
-	void SetTextColor(int color) {
+		// to make material and other params for objects (empty for now)
+		struct renderer_object_t {
 
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleTextAttribute(hConsole, color);
+		};
+
+		// colors of objects
+		namespace Colors {
+
+			// constexpr color definition instead of magical values in the define or function
+			constexpr WORD Default = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;			// white
+			constexpr WORD BrightWhite = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+			constexpr WORD Yellow = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
+			constexpr WORD Magenta = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+			constexpr WORD BrightGreen = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+			constexpr WORD RedGreen = FOREGROUND_RED | FOREGROUND_GREEN;
+			constexpr WORD RedBlue = FOREGROUND_RED | FOREGROUND_BLUE;
+			constexpr WORD Blue = FOREGROUND_BLUE;
+			constexpr WORD BrightRed = FOREGROUND_RED | FOREGROUND_INTENSITY;
+		}
 	}
 
 }
 
-namespace RenderObjects {
+namespace SpawnUtils {
 
-	enum objectTypes { PATH = ' ', WALL = '#' };
+	// spawn wall if taken coords == random coords width got from area
+	// use srand() on the game initialization, this is not the task of Renderer
+	// todo: move map creation to Game class (but right now it is simplified)
+	bool isWallSpawnable(const coord_t& coords, const int areaHeight, const int areaWidth) {
 
+		coord_t spawnCoords = { rand() % areaHeight, rand() % areaWidth };
 
-	// to make material and other params for objects (empty for now)
-	struct renderer_object_t {
+		return coords == spawnCoords;
+	}
 
-	};
-
-	namespace Utils {
-
-		// spawn wall if taken coords == random coords width got from area
-		// use srand() on the game initialization, this is not the task of Renderer
-		// todo: move map creation to Game class (but right now it is simplified)
-		bool isWallSpawnable(const coord_t& coords, const int areaHeight, const int areaWidth) {
-			
-			coord_t spawnCoords = { rand() % areaHeight, rand() % areaWidth };
-
-			return coords == spawnCoords;
-		}
-
-		bool isWallPercentSpawnable(const coord_t& coords, int spawnPercent = 40) {
-			return (rand() % 100 + 1) <= spawnPercent;
-		}
+	bool isWallPercentSpawnable(const coord_t& coords, int spawnPercent = 40) {
+		return (rand() % 100 + 1) <= spawnPercent;
 	}
 }
 
@@ -125,16 +149,18 @@ class Renderer {
 	static constexpr int MAP_HEIGHT = 16;
 	static constexpr int MAP_WIDTH = 16;
 
+	static constexpr int MINIMAP_SIZE = MAP_HEIGHT;
+
 	static constexpr int RENDER_DELAY = 50;		// ms, reduced to increase FPS
 
 	// array to store game map
 	std::vector<std::vector<char>> map;			// MAP_HEIGHT x MAP_WIDTH
 
-	static constexpr float FOV = rendPI / 4.0f; // field of view, pi/4
-	static constexpr float depth = 16.0f;		// max render distance
+	static constexpr float FOV = RenderConst::Math::QUART_PI;	// field of view, pi/4
+	static constexpr float depth = 16.0f;						// max render distance
 
 	// player data
-	fcoord_t playerCoord;			// x, y
+	fcoord_t playerCoord; // x, y
 	float playerAngle;		
 
 	static constexpr float MOVEMENT_SPEED = 0.25f;
@@ -214,7 +240,7 @@ public:
 			else {
 				// check if wall is hit
 				coord_t mapCoord = { (int)rayCoord.x, (int)rayCoord.y };
-				if (map[mapCoord.y][mapCoord.x] == RenderObjects::WALL)
+				if (map[mapCoord.y][mapCoord.x] == Render::Objects::WALL)
 					isWallHit = true;
 			}
 
@@ -224,10 +250,10 @@ public:
 	}
 
 
-	// choose drawing symbol for wall based on its distance
+	// Get drawing symbol for wall based on its distance
 	char getWallSymb(float distance) {
 
-		static const char symbs[] = { ' ', '#', 'X', 'O', 'x', ' - ', '.'};	// nothing as 0
+		static const char symbs[] = { ' ', '#', 'X', 'O', 'x', ' - ', '.'};				// nothing as 0
 		static constexpr int symbArrSize = (int)(sizeof(symbs) / (sizeof(symbs[0])));	// to know it when compiled
 		static const float distLimits[] = {
 			depth / 4.0f,					// too short dist
@@ -255,12 +281,7 @@ public:
 
 	void render() {
 
-		// clear screen
-		//for (int i = 0; i < RENDER_WIDTH * RENDER_HEIGHT; ++i) {
-		//	screen[i].Char.AsciiChar = ' ';
-		//	screen[i].Attributes = 0;
-		//}
-		clearScreen();	// now clears just str buffer
+		//clearScreenBuffer();	// now clears just str buffer
 		// removed cls
 		// system("cls");
 
@@ -286,21 +307,12 @@ public:
 			for (int y = 0; y < RENDER_HEIGHT; ++y) {
 				int screenIndex = y * RENDER_WIDTH + x;	// scale coord to screen size
 
-				if (y < wallTop) {												// upper the wall
-					//screen[screenIndex].Char.AsciiChar = RenderObjects::PATH;
-					//screen[screenIndex].Attributes = BACKGROUND_BLUE >> 1; // set color
-					screenBuffer[y][x] = RenderObjects::PATH;
-				}
-				else if (y >= wallTop && y <= wallBottom) {						// in-wall
-					//screen[screenIndex].Char.AsciiChar = getWallSymb(distance);
-					//screen[screenIndex].Attributes = getWallColor(distance);
+				if (y < wallTop) 											// upper the wall
+					screenBuffer[y][x] = Render::Objects::PATH;
+				else if (y >= wallTop && y <= wallBottom)					// in-wall
 					screenBuffer[y][x] = getWallSymb(distance);
-				}
-				else {															// under the wall
-					//screen[screenIndex].Char.AsciiChar = RenderObjects::PATH;
-					//screen[screenIndex].Attributes = BACKGROUND_GREEN >> 1;
-					screenBuffer[y][x] = RenderObjects::PATH;
-				}
+				else 														// under the wall
+					screenBuffer[y][x] = Render::Objects::PATH;
 			}
 
 		}
@@ -311,11 +323,6 @@ public:
 
 		// draw final buffer to the screen (render -> screen)
 		displayScreen();
-
-		// old one
-		//SMALL_RECT writeRegion = { 0, 0, RENDER_WIDTH - 1, RENDER_HEIGHT - 1 };
-		//WriteConsoleOutput(hConsole, screen, { RENDER_WIDTH, RENDER_HEIGHT }, { 0, 0 }, &writeRegion);
-
 	}
 
 	void renderPlayerInfo() {
@@ -326,17 +333,12 @@ public:
 		std::string info = infoBuf;
 		if (info.length() > RENDER_WIDTH) info.resize(RENDER_WIDTH);
 
-		for (int i = 0; i < strlen(infoBuf) && i < RENDER_WIDTH; ++i) {
+		for (int i = 0; i < strlen(infoBuf) && i < RENDER_WIDTH; ++i)
 			screenBuffer[0][i] = info[i];
-
-
-			//screen[i].Char.AsciiChar = infoBuf[i];
-			//screen[i].Attributes = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-		}
 	}
 
 	void renderMiniMap() {
-		int miniMapSize = 16;	// but would be better to scale of real map sizes
+		int miniMapSize = MINIMAP_SIZE;	// scaled one now
 
 		coord_t offset = { RENDER_WIDTH - miniMapSize - 1, 1 };
 		
@@ -385,7 +387,7 @@ public:
 	void run() {
 		bool isRunning = true;
 
-		system("cls");	// clear window before game drawing
+		system("cls");			// clear window before game drawing
 		while (isRunning) {
 			
 			handleInput();
@@ -395,41 +397,38 @@ public:
 			// stop render when Esc pressed
 			if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) isRunning = false;
 
-			//Sleep(16); // 16 ms ~60 FPS, delay to stabilize frames
-			
-			// sleep time increased because of another displaying method 
+			// sleep time with delay to stabilize frames (~FPS)
 			Sleep(RENDER_DELAY);
 		}
 
 	}
 
 
-	// class utils
+// class utils
 private:
 
 	// normalize angle to [0; 2pi]
 	void normalizeAngle(float& angle) {
-		while (angle < 0) angle += 2 * rendPI;
-		while (angle >= 2 * rendPI) angle -= 2 * rendPI;
+		while (angle < 0) angle += RenderConst::Math::TWO_PI;
+		while (angle >= RenderConst::Math::TWO_PI) angle -= RenderConst::Math::TWO_PI;
 	}
 
-	void clearScreen() {
-		// clear buffer
+	// Clears screenBuffer
+	void clearScreenBuffer() {
+
 		for (auto& line : screenBuffer)
 			std::fill(line.begin(), line.end(), ' ');
-
-		//system("cls");	// clear console
 	}
 
 
 	// display buffer through console output and also define elements colors
 	void displayScreen() {
-		//for (const auto& line : screenBuffer)
-		//	std::cout << line << '\n';			// no need in the std::endl that resets default console buffer when called
 
-		RenderUtils::MoveToXY(0, 0);
+		//clearScreenBuffer();
+
+		Render::Utils::MoveToXY(0, 0);
 		for (int y = 0; y < RENDER_HEIGHT; ++y) {
-			RenderUtils::MoveToXY(0, y);		// move to start of every Y line
+			Render::Utils::MoveToXY(0, y);		// move to start of every Y line
 
 			for (int x = 0; x < RENDER_WIDTH; ++x) {
 				
@@ -440,75 +439,59 @@ private:
 
 					// in-screen walls displaying colors
 				case '#':
-					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+					Render::Utils::SetTextColor(Render::Objects::Colors::BrightWhite);
 					break;
 				case 'X':
 					if (!y)	// if this is X axis in the info label
-						RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+						Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
 					else // 'X' as wall symbol
-						RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+						Render::Utils::SetTextColor(Render::Objects::Colors::Default); // white
 					break;
 				case 'O':
-					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_GREEN);
+					Render::Utils::SetTextColor(Render::Objects::Colors::RedGreen);
 					break;
 				case 'x':
-					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_BLUE);
+					Render::Utils::SetTextColor(Render::Objects::Colors::RedBlue);
 					break;
 				case '-':
-					RenderUtils::SetTextColor(FOREGROUND_BLUE);
+					Render::Utils::SetTextColor(Render::Objects::Colors::Blue);
 					break;
 				case '.':
-					SET_DEFAULT_COLOR;
+					Render::Utils::setDefaultColor();
 					break;
 				case '@':
-					RenderUtils::SetTextColor(FOREGROUND_RED | FOREGROUND_INTENSITY);
+					Render::Utils::SetTextColor(Render::Objects::Colors::BrightRed);
 					break;
 				default:
 
 					if (isalpha(symb) || isdigit(symb))		// zero-line player info, recolor only text/nums
-						RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-					else SET_DEFAULT_COLOR;
+						Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
+					else Render::Utils::setDefaultColor();
 					break;
 				}
 
-				//if (!y) // zero-line, player info
-				//	RenderUtils::SetTextColor(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-
 				// display symbol after coloring
 				std::cout << symb;
-
 			}
-
 		}
 
-		SET_DEFAULT_COLOR;
-		// removed cls so flush out buffer directly
-		std::cout.flush();
+		Render::Utils::setDefaultColor();
+		std::cout.flush(); // removed cls so flush out buffer directly
 	}
+
 
 	std::vector<std::vector<char>> generateMap() {
 
 		std::vector<std::vector<char>> newMap(MAP_HEIGHT, std::vector<char>(MAP_WIDTH));
 
-		//char** newMap = new char* [MAP_HEIGHT];
-
 		for (int i = 0; i < MAP_HEIGHT; ++i) {
-
-			//newMap[i] = new char[MAP_WIDTH];
 
 			for (int j = 0; j < MAP_WIDTH; ++j) {
 
-				if (!i || !j || j == MAP_WIDTH - 1 || i == MAP_HEIGHT - 1) {
-
-					//newMap[i].push_back(RenderObjects::WALL);
-					
-					// coz dimentions are presized now
-					newMap[i][j] = RenderObjects::WALL;
-				}
-				else {
-					newMap[i][j] = RenderObjects::PATH;
-					//newMap[i].push_back(RenderObjects::PATH);
-				}
+				if (!i || !j || j == MAP_WIDTH - 1 || i == MAP_HEIGHT - 1)
+					newMap[i][j] = Render::Objects::WALL;	// coz dimentions are presized now
+				else
+					newMap[i][j] = Render::Objects::PATH;
 			}
 		}
 
@@ -520,18 +503,17 @@ private:
 				coord_t spawnCoords = { i , j };
 
 				//if (RenderObjects::isWallSpawnable(spawnCoords, MAP_HEIGHT, MAP_WIDTH))
-				if (RenderObjects::Utils::isWallPercentSpawnable(spawnCoords, 30))		// 40% by default
-					newMap[i][j] = RenderObjects::WALL;
+				if (SpawnUtils::isWallPercentSpawnable(spawnCoords, 30))		// 40% by default
+					newMap[i][j] = Render::Objects::WALL;
 			}
 
-		newMap[coords.x][coords.y] = RenderObjects::PATH;
+		newMap[coords.x][coords.y] = Render::Objects::PATH;
 
 		return newMap;
 	}
 
 
 	void handleInput() {
-
 
 		// rotate to A-D
 		// move forward-backward to W-S
@@ -554,7 +536,7 @@ private:
 				newPlayerCoord.y = playerCoord.y - sinf(playerAngle) * MOVEMENT_SPEED;
 			}
 
-			if (map[(int)newPlayerCoord.y][(int)newPlayerCoord.x] == RenderObjects::PATH)
+			if (map[(int)newPlayerCoord.y][(int)newPlayerCoord.x] == Render::Objects::PATH)
 				playerCoord = newPlayerCoord;
 
 			normalizeAngle(playerAngle);
