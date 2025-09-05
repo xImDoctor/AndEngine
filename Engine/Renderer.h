@@ -15,6 +15,7 @@
 #include <iostream>
 
 
+// todo: move map creation to Game class (but right now it is simplified)
 
 namespace RenderConst {
 
@@ -27,12 +28,6 @@ namespace RenderConst {
 		static constexpr float QUART_PI = PI * 0.25f;	// Pi/4
 	}
 }
-
-// also:
-// todo: move map creation to Game class (but right now it is simplified)
-// todo: choose drawing color for wall based on its disntace - getWallColor
-// HAVE TO DO A LOT OF REFACTORING!
-
 
 struct coord_t {
 	int x, y;
@@ -63,6 +58,32 @@ struct fcoord_t {
 
 namespace Render {
 
+	namespace Objects {
+
+		enum objectTypes { PATH = ' ', WALL = '#' };
+
+
+		// to make material and other params for objects (empty for now)
+		struct renderer_object_t {
+
+		};
+
+		// colors of objects
+		namespace Colors {
+
+			// constexpr color definition instead of magical values in the define or function
+			constexpr WORD White = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;			// white
+			constexpr WORD BrightWhite = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+			constexpr WORD Yellow = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
+			constexpr WORD Magenta = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+			constexpr WORD BrightGreen = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+			constexpr WORD RedGreen = FOREGROUND_RED | FOREGROUND_GREEN;
+			constexpr WORD RedBlue = FOREGROUND_RED | FOREGROUND_BLUE;
+			constexpr WORD Blue = FOREGROUND_BLUE;
+			constexpr WORD BrightRed = FOREGROUND_RED | FOREGROUND_INTENSITY;
+		}
+	}
+
 	namespace Utils {
 
 		void MoveToXY(int x, int y) {
@@ -87,38 +108,13 @@ namespace Render {
 			SetConsoleTextAttribute(hConsole, color);
 		}
 
+		namespace objColors = ::Render::Objects::Colors;
+
 		// set default color inline function instead of pre-defined macro
 		inline void setDefaultColor() {
-			Utils::SetTextColor(Objects::Colors::Default);
+			SetTextColor(objColors::White);
 		}
 	}
-
-	namespace Objects {
-
-		enum objectTypes { PATH = ' ', WALL = '#' };
-
-
-		// to make material and other params for objects (empty for now)
-		struct renderer_object_t {
-
-		};
-
-		// colors of objects
-		namespace Colors {
-
-			// constexpr color definition instead of magical values in the define or function
-			constexpr WORD Default = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;			// white
-			constexpr WORD BrightWhite = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-			constexpr WORD Yellow = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
-			constexpr WORD Magenta = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-			constexpr WORD BrightGreen = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-			constexpr WORD RedGreen = FOREGROUND_RED | FOREGROUND_GREEN;
-			constexpr WORD RedBlue = FOREGROUND_RED | FOREGROUND_BLUE;
-			constexpr WORD Blue = FOREGROUND_BLUE;
-			constexpr WORD BrightRed = FOREGROUND_RED | FOREGROUND_INTENSITY;
-		}
-	}
-
 }
 
 namespace SpawnUtils {
@@ -284,7 +280,7 @@ public:
 			if (!heightValue)	// if this is first line (y=0) where player info located
 				Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
 			else // 'X' as wall symbol
-				Render::Utils::SetTextColor(Render::Objects::Colors::Default); // white
+				Render::Utils::SetTextColor(Render::Objects::Colors::White); // white
 			break;
 		case 'O':
 			Render::Utils::SetTextColor(Render::Objects::Colors::RedGreen);
