@@ -16,6 +16,12 @@
 
 // simplified (shorten Pi defined), not const from math.h
 #define rendPI 3.14159f
+namespace RenderConst {
+	namespace Math {
+		static constexpr float Pi = 3.1415926535f;
+
+	}
+}
 
 // todo: move map creation to Game class (but right now it is simplified)
 // todo: choose drawing color for wall based on its disntace - getWallColor
@@ -33,10 +39,7 @@ struct coord_t {
 
 	// overload for == operator to use coord_t directly in the conditions
 	friend bool operator==(const coord_t& coords1, const coord_t& coords2) {
-		if (coords1.x == coords2.x && coords1.y == coords2.y)
-			return true;
-
-		return false;
+		return coords1.x == coords2.x && coords1.y == coords2.y;
 	}
 
 	friend bool operator!=(const coord_t& coords1, const coord_t& coords2) { 
@@ -48,12 +51,8 @@ struct coord_t {
 struct fcoord_t {
 	float x, y;
 
-	// overload for == operator to use fcoord_t directly in the conditions
 	friend bool operator==(const fcoord_t& coords1, const fcoord_t& coords2) {
-		if (coords1.x == coords2.x && coords1.y == coords2.y)
-			return true;
-
-		return false;
+		return coords1.x == coords2.x && coords1.y == coords2.y;
 	}
 
 	friend bool operator!=(const fcoord_t& coords1, const fcoord_t& coords2) {
@@ -103,23 +102,14 @@ namespace RenderObjects {
 		// use srand() on the game initialization, this is not the task of Renderer
 		// todo: move map creation to Game class (but right now it is simplified)
 		bool isWallSpawnable(const coord_t& coords, const int areaHeight, const int areaWidth) {
+			
+			coord_t spawnCoords = { rand() % areaHeight, rand() % areaWidth };
 
-			coord_t spawnCoords;
-			spawnCoords.x = rand() % areaHeight;
-			spawnCoords.y = rand() % areaWidth;
-
-			if (coords == spawnCoords)
-				return true;
-
-			return false;
+			return coords == spawnCoords;
 		}
 
 		bool isWallPercentSpawnable(const coord_t& coords, int spawnPercent = 40) {
-
-			if ((rand() % 100 + 1) <= spawnPercent)
-				return true;
-
-			return false;
+			return (rand() % 100 + 1) <= spawnPercent;
 		}
 	}
 }
@@ -128,32 +118,28 @@ namespace RenderObjects {
 class Renderer {
 
 	// render window size
-	static const int RENDER_HEIGHT = 60;
-	static const int RENDER_WIDTH = 280;
+	static constexpr int RENDER_HEIGHT = 60;
+	static constexpr int RENDER_WIDTH = 280;
 
 	// array size
-	static const int MAP_HEIGHT = 16;
-	static const int MAP_WIDTH = 16;
+	static constexpr int MAP_HEIGHT = 16;
+	static constexpr int MAP_WIDTH = 16;
 
-	static const int RENDER_DELAY = 100;	// ms
+	static constexpr int RENDER_DELAY = 50;		// ms, reduced to increase FPS
 
 	// array to store game map
-	std::vector<std::vector<char>> map;		// MAP_HEIGHT x MAP_WIDTH
+	std::vector<std::vector<char>> map;			// MAP_HEIGHT x MAP_WIDTH
 
+	static constexpr float FOV = rendPI / 4.0f; // field of view, pi/4
+	static constexpr float depth = 16.0f;		// max render distance
 
+	// player data
 	fcoord_t playerCoord;			// x, y
-	float playerAngle;
+	float playerAngle;		
 
-	float fov = rendPI / 4.0f;		// field of view, pi/4
-	float depth = 16.0f;			// max render distance
+	static constexpr float MOVEMENT_SPEED = 0.25f;
+	static constexpr float ROTATION_SPEED = 0.3f;
 
-	// player speed
-	float movementSpeed = 0.1f;
-	float rotationSpeed = 0.3f;
-
-	// console
-	//HANDLE hConsole;
-	//CHAR_INFO* screen;
 
 	// use string as simple console buffer
 	std::vector<std::string> screenBuffer;
@@ -171,10 +157,6 @@ public:
 		for (auto& line : screenBuffer)
 			line.resize(RENDER_WIDTH, ' '); // resize and clear strings
 
-
-		//hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-		//SetConsoleActiveScreenBuffer(hConsole);
-		//screen = new CHAR_INFO[RENDER_HEIGHT * RENDER_WIDTH];
 		
 		// hide cursor when console is active
 		CONSOLE_CURSOR_INFO cursorInfo;
@@ -187,15 +169,10 @@ public:
 
 	}
 
-	//~Renderer() {
-	//	delete[] screen;
-	//	CloseHandle(hConsole);
-	//}
 	~Renderer() = default;
 
-
 	// show created/choosen map (for debug, not for player)
-	void renderMap() const {
+	void showMap() const {
 
 		for (const auto& row : map) {
 			for (const auto cell : row)
@@ -204,7 +181,6 @@ public:
 			std::cout << std::endl;
 		}
 	}
-
 
 	// simple raycast algorithm, returns float distance from player to object
 	float castRay(float rayAngle) {
@@ -251,14 +227,23 @@ public:
 	// choose drawing symbol for wall based on its distance
 	char getWallSymb(float distance) {
 
-		if (distance <= depth / 4.0f) return '#';		// too short
-		else if (distance <= depth / 3.5f) return 'X';
-		else if (distance <= depth / 3.0f) return 'O';
-		else if (distance <= depth / 2.5f) return 'x';
-		else if (distance <= depth / 2.0f) return '-';
-		else if (distance <= depth)	return '.';			// too far
+		static const char symbs[] = { ' ', '#', 'X', 'O', 'x', ' - ', '.'};	// nothing as 0
+		static constexpr int symbArrSize = (int)(sizeof(symbs) / (sizeof(symbs[0])));	// to know it when compiled
+		static const float distLimits[] = {
+			depth / 4.0f,					// too short dist
+			depth / 3.5f,
+			depth / 3.0f,
+			depth / 2.5f,
+			depth / 2.0f,
+			depth							// too far dist
+		};
+
+
+		for (int i = 1; i < symbArrSize - 1; ++i)
+			if (distance <= distLimits[i])
+				return symbs[i];
 		 
-		return ' '; // nothing in the view
+		return symbs[0];	// return ' ' if nothing
 	}
 
 	// todo:: choose drawing color for wall based on its distance
@@ -282,7 +267,7 @@ public:
 		// render every col on the screen to make walls
 		for (int x = 0; x < RENDER_WIDTH; ++x) {
 
-			float rayAngle = (playerAngle - fov / 2.0f) + ((float)x / (float)RENDER_WIDTH) * fov;
+			float rayAngle = (playerAngle - FOV / 2.0f) + ((float)x / (float)RENDER_WIDTH) * FOV;
 
 			// casting ray to return wall distance
 			float distance = castRay(rayAngle);
@@ -551,22 +536,22 @@ private:
 		// rotate to A-D
 		// move forward-backward to W-S
 		if (GetAsyncKeyState('A') & 0x8000)
-			playerAngle -= rotationSpeed;
+			playerAngle -= ROTATION_SPEED;
 		else if (GetAsyncKeyState('D') & 0x8000)
-			playerAngle += rotationSpeed;
+			playerAngle += ROTATION_SPEED;
 		else {
 
 			fcoord_t newPlayerCoord = playerCoord;
 
 			if (GetAsyncKeyState('W') & 0x8000) {
 
-				newPlayerCoord.x = playerCoord.x + cosf(playerAngle) * movementSpeed;
-				newPlayerCoord.y = playerCoord.y + sinf(playerAngle) * movementSpeed;
+				newPlayerCoord.x = playerCoord.x + cosf(playerAngle) * MOVEMENT_SPEED;
+				newPlayerCoord.y = playerCoord.y + sinf(playerAngle) * MOVEMENT_SPEED;
 			}
 			else if (GetAsyncKeyState('S') & 0x8000) {
 
-				newPlayerCoord.x = playerCoord.x - cosf(playerAngle) * movementSpeed;
-				newPlayerCoord.y = playerCoord.y - sinf(playerAngle) * movementSpeed;
+				newPlayerCoord.x = playerCoord.x - cosf(playerAngle) * MOVEMENT_SPEED;
+				newPlayerCoord.y = playerCoord.y - sinf(playerAngle) * MOVEMENT_SPEED;
 			}
 
 			if (map[(int)newPlayerCoord.y][(int)newPlayerCoord.x] == RenderObjects::PATH)
