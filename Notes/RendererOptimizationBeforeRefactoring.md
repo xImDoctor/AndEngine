@@ -26,6 +26,7 @@ Batch drawing symbols to batches organized by the same color
 Use arrays `array` instead of `vector` for critical paths
 Optimization of `map` access
 
+5. Condition simplification and etc
 
 ### Solved problems
 - [ ] Raycasting
@@ -33,4 +34,5 @@ Optimization of `map` access
 - [ ] Moved evals to consts, etc
 - [ ] Redrawing
 - [ ] Data stucrutures changed
+- [ ] Conditions simplified (*additionally*)
 

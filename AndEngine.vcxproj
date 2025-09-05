@@ -133,6 +133,9 @@
   <ItemGroup>
     <ClInclude Include="Engine\Renderer.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Notes\RendererOptimizationBeforeRefactoring.md" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
