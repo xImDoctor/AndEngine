@@ -251,7 +251,7 @@ public:
 
 
 	// Get drawing symbol for wall based on its distance
-	char getWallSymb(float distance) {
+	char getObjectSymb(float distance) {
 
 		static const char symbs[] = { ' ', '#', 'X', 'O', 'x', ' - ', '.'};				// nothing as 0
 		static constexpr int symbArrSize = (int)(sizeof(symbs) / (sizeof(symbs[0])));	// to know it when compiled
@@ -272,16 +272,48 @@ public:
 		return symbs[0];	// return ' ' if nothing
 	}
 
-	// todo:: choose drawing color for wall based on its distance
-	WORD getWallColor(float dinstance) {
+	// Chooses symbol color depending on its shape and sets color to it
+	void setObjectColor(const char symb) {
 
-		return 0;
+		switch (symb) {
+			// in-screen walls displaying colors
+		case '#':
+			Render::Utils::SetTextColor(Render::Objects::Colors::BrightWhite);
+			break;
+		case 'X':
+			if (!y)	// if this is X axis in the info label
+				Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
+			else // 'X' as wall symbol
+				Render::Utils::SetTextColor(Render::Objects::Colors::Default); // white
+			break;
+		case 'O':
+			Render::Utils::SetTextColor(Render::Objects::Colors::RedGreen);
+			break;
+		case 'x':
+			Render::Utils::SetTextColor(Render::Objects::Colors::RedBlue);
+			break;
+		case '-':
+			Render::Utils::SetTextColor(Render::Objects::Colors::Blue);
+			break;
+		case '.':
+			Render::Utils::setDefaultColor();
+			break;
+		case '@':
+			Render::Utils::SetTextColor(Render::Objects::Colors::BrightRed);
+			break;
+		default:
+
+			if (isalpha(symb) || isdigit(symb))		// zero-line player info, recolor only text/nums
+				Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
+			else Render::Utils::setDefaultColor();
+			break;
+		}
+
 	}
 
 
 	void render() {
 
-		//clearScreenBuffer();	// now clears just str buffer
 		// removed cls
 		// system("cls");
 
@@ -310,7 +342,7 @@ public:
 				if (y < wallTop) 											// upper the wall
 					screenBuffer[y][x] = Render::Objects::PATH;
 				else if (y >= wallTop && y <= wallBottom)					// in-wall
-					screenBuffer[y][x] = getWallSymb(distance);
+					screenBuffer[y][x] = getObjectSymb(distance);
 				else 														// under the wall
 					screenBuffer[y][x] = Render::Objects::PATH;
 			}
@@ -433,42 +465,7 @@ private:
 			for (int x = 0; x < RENDER_WIDTH; ++x) {
 				
 				char symb = screenBuffer[y][x];
-
-				// choose colors for symbols
-				switch (symb) {
-
-					// in-screen walls displaying colors
-				case '#':
-					Render::Utils::SetTextColor(Render::Objects::Colors::BrightWhite);
-					break;
-				case 'X':
-					if (!y)	// if this is X axis in the info label
-						Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
-					else // 'X' as wall symbol
-						Render::Utils::SetTextColor(Render::Objects::Colors::Default); // white
-					break;
-				case 'O':
-					Render::Utils::SetTextColor(Render::Objects::Colors::RedGreen);
-					break;
-				case 'x':
-					Render::Utils::SetTextColor(Render::Objects::Colors::RedBlue);
-					break;
-				case '-':
-					Render::Utils::SetTextColor(Render::Objects::Colors::Blue);
-					break;
-				case '.':
-					Render::Utils::setDefaultColor();
-					break;
-				case '@':
-					Render::Utils::SetTextColor(Render::Objects::Colors::BrightRed);
-					break;
-				default:
-
-					if (isalpha(symb) || isdigit(symb))		// zero-line player info, recolor only text/nums
-						Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
-					else Render::Utils::setDefaultColor();
-					break;
-				}
+				setObjectColor(symb);
 
 				// display symbol after coloring
 				std::cout << symb;
