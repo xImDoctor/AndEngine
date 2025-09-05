@@ -273,7 +273,7 @@ public:
 	}
 
 	// Chooses symbol color depending on its shape and sets color to it
-	void setObjectColor(const char symb) {
+	void setObjectColor(const char symb, const int heightValue = 1) { // predefine with 1 not to use when not written in other code
 
 		switch (symb) {
 			// in-screen walls displaying colors
@@ -281,7 +281,7 @@ public:
 			Render::Utils::SetTextColor(Render::Objects::Colors::BrightWhite);
 			break;
 		case 'X':
-			if (!y)	// if this is X axis in the info label
+			if (!heightValue)	// if this is first line (y=0) where player info located
 				Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
 			else // 'X' as wall symbol
 				Render::Utils::SetTextColor(Render::Objects::Colors::Default); // white
@@ -465,7 +465,7 @@ private:
 			for (int x = 0; x < RENDER_WIDTH; ++x) {
 				
 				char symb = screenBuffer[y][x];
-				setObjectColor(symb);
+				setObjectColor(symb, y);
 
 				// display symbol after coloring
 				std::cout << symb;
