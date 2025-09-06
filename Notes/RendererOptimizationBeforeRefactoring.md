@@ -31,8 +31,8 @@ Optimization of `map` access
 ### Solved problems
 - [ ] Raycasting
 - [ ] Optimized trigonometry
-- [ ] Moved evals to consts, etc
+- [x] Moved evals to consts, etc
 - [ ] Redrawing
-- [ ] Data stucrutures changed
-- [ ] Conditions simplified (*additionally*)
+- [x] Data stucrutures changed
+- [x] Conditions simplified (*additionally*)
 
