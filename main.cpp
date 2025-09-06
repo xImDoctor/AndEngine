@@ -16,7 +16,7 @@ void showStartAlgInfo(const char* infoPart = "general") {
 		std::cout << "AndEngine renderer test." << std::endl;
 		std::cout << "Type one of the following commands:" << std::endl;
 
-		std::cout << "start raycast - starts console rendering with step-based raycast" << std::endl;
+		std::cout << "start, start raycast - starts console rendering with step-based raycast" << std::endl;
 		std::cout << "start dda - starts console rendering with DDA Raycasting algorithm" << std::endl; // faster one
 		std::cout << "info - information about in-scene data and controls" << std::endl;
 		std::cout << "exit - stop this application" << std::endl;
@@ -32,31 +32,36 @@ void showStartAlgInfo(const char* infoPart = "general") {
 	}
 }
 
+
 // Starts engine rendering with one of the choosen algorithms (step-based, dda)
 void startAlgTest(Renderer& renderer) {
 
-	char inputBuf[14];	// 'start raycast' string size + 1 to '\0'
+	const std::size_t MAX_START_INPUT_SIZE = 14;
+	std::string inputBuf;
 	
 	while (1) {
+
+		if (inputBuf.size() > MAX_START_INPUT_SIZE)
+			inputBuf.resize(MAX_START_INPUT_SIZE);
+
 		system("cls");
 		showStartAlgInfo("general");
 
 		std::cout << "Input: \n";
-		scanf_s("%13s", inputBuf, (unsigned)_countof(inputBuf));
+		std::getline(std::cin, inputBuf);
 
-		if (strcmp(inputBuf, "start raycast") == 0) {
+		if (inputBuf == "start" || inputBuf == "start raycast") {
 			renderer.run();
-			break;
 		}
-		else if (strcmp(inputBuf, "start dda") == 0) {
+		else if (inputBuf == "start dda" || inputBuf == "start DDA") {
 			std::cout << "DDA is not implemented now" << std::endl;
 			showStartAlgInfo("continue");
 		}
-		else if (strcmp(inputBuf, "info") == 0) {
+		else if (inputBuf == "info") {
 			system("cls");
 			showStartAlgInfo("controls");
 		}
-		else if (strcmp(inputBuf, "exit") == 0) {
+		else if (inputBuf == "exit") {
 			std::cout << "App stopped, goodbye!\n";
 			exit(0);	// instead of break to exit whole app, not just this method
 		}
