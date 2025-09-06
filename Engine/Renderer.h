@@ -14,126 +14,12 @@
 #include <cstdio>
 #include <iostream>
 
+#include "render_utils.h"	// namespace RenderConsts, Render (Utils, Objects::Colors)
+#include "spawn_utils.h"	// isWallSpawnable
+
 
 // todo: move map creation to Game class (but right now it is simplified)
 
-namespace RenderConst {
-
-	// simplified (shorten) Pi pre-defined, not const from math.h
-	// also other values with Pi radian
-	namespace Math {
-		static constexpr float PI = 3.1415926535f;		// Pi
-		static constexpr float TWO_PI = PI * 2.0f;		// 2Pi
-		static constexpr float HALF_PI = PI * 0.5f;		// Pi/2
-		static constexpr float QUART_PI = PI * 0.25f;	// Pi/4
-	}
-}
-
-struct coord_t {
-	int x, y;
-
-	// overload for == operator to use coord_t directly in the conditions
-	friend bool operator==(const coord_t& coords1, const coord_t& coords2) {
-		return coords1.x == coords2.x && coords1.y == coords2.y;
-	}
-
-	friend bool operator!=(const coord_t& coords1, const coord_t& coords2) { 
-		return !(coords1 == coords2);
-	}
-};
-
-
-struct fcoord_t {
-	float x, y;
-
-	friend bool operator==(const fcoord_t& coords1, const fcoord_t& coords2) {
-		return coords1.x == coords2.x && coords1.y == coords2.y;
-	}
-
-	friend bool operator!=(const fcoord_t& coords1, const fcoord_t& coords2) {
-		return !(coords1 == coords2);
-	}
-};
-
-
-namespace Render {
-
-	namespace Objects {
-
-		enum objectTypes { PATH = ' ', WALL = '#' };
-
-
-		// to make material and other params for objects (empty for now)
-		struct renderer_object_t {
-
-		};
-
-		// colors of objects
-		namespace Colors {
-
-			// constexpr color definition instead of magical values in the define or function
-			// WORD = unsigned short in Win type definition
-			constexpr WORD White = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;			// white
-			constexpr WORD BrightWhite = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-			constexpr WORD Yellow = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
-			constexpr WORD Magenta = FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-			constexpr WORD BrightGreen = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-			constexpr WORD RedGreen = FOREGROUND_RED | FOREGROUND_GREEN;
-			constexpr WORD RedBlue = FOREGROUND_RED | FOREGROUND_BLUE;
-			constexpr WORD Blue = FOREGROUND_BLUE;
-			constexpr WORD BrightRed = FOREGROUND_RED | FOREGROUND_INTENSITY;
-		}
-	}
-
-	namespace Utils {
-
-		void MoveToXY(int x, int y) {
-
-			COORD pos = { static_cast<SHORT>(x), static_cast<SHORT>(y) };
-
-			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleCursorPosition(output, pos);
-		}
-
-		void MoveToXY(const coord_t& coords) {
-
-			COORD pos = { static_cast<SHORT>(coords.x), static_cast<SHORT>(coords.y) };
-
-			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleCursorPosition(output, pos);
-		}
-
-		void SetTextColor(int color) {
-
-			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleTextAttribute(hConsole, color);
-		}
-
-		namespace objColors = ::Render::Objects::Colors;
-
-		// set default color inline function instead of pre-defined macro
-		inline void setDefaultColor() {
-			SetTextColor(objColors::White);
-		}
-	}
-}
-
-namespace SpawnUtils {
-
-	// spawn wall if taken coords == random coords width got from area
-	// use srand() on the game initialization, this is not the task of Renderer
-	// todo: move map creation to Game class (but right now it is simplified)
-	bool isWallSpawnable(const coord_t& coords, const int areaHeight, const int areaWidth) {
-
-		coord_t spawnCoords = { rand() % areaHeight, rand() % areaWidth };
-
-		return coords == spawnCoords;
-	}
-
-	bool isWallPercentSpawnable(const coord_t& coords, int spawnPercent = 40) {
-		return (rand() % 100 + 1) <= spawnPercent;
-	}
-}
 
 // try to make base raytracing system - Console Raycaster
 class Renderer {
