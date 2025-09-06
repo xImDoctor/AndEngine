@@ -1,20 +1,76 @@
-//#include <iostream>
-//#include <cstdlib>
 
 // proj libs
 #include "Engine/Renderer.h"
 
 
-int main() {
+void showStartAlgInfo(const char* infoPart = "general") {
 
-	//setlocale(0, "rus");
-	//system("mode con: cols=120 lines=40");
-	//system("chcp 437");
+	if (infoPart == "continue") {
+		std::cout << "Press any key to continue" << std::endl;
+		system("pause>nul");
+		return;
+	}
+
+	if (infoPart == "general") {
+
+		std::cout << "AndEngine renderer test." << std::endl;
+		std::cout << "Type one of the following commands:" << std::endl;
+
+		std::cout << "start raycast - starts console rendering with step-based raycast" << std::endl;
+		std::cout << "start dda - starts console rendering with DDA Raycasting algorithm" << std::endl; // faster one
+		std::cout << "info - information about in-scene data and controls" << std::endl;
+		std::cout << "exit - stop this application" << std::endl;
+	}
+	else if (infoPart == "controls") {
+
+		std::cout << "Now you can watch simple raycast rendering visualization with two algoritm realizations: step-based, DDA" <<
+			"\nDemonstration starts on the randomly generated map" << std::endl << std::endl;
+		std::cout << "Controls:\n- W/S - move forward/backward\n- A/D - rotate camera to left/right\n- Esc - stop (leave) rendering" << std::endl << std::endl;
+		std::cout << "Other info:\n- Wall symbols and colors are different based on distance towards it\n-There is the minimap of created scene in the upper-right corner" << std::endl;
+		
+		showStartAlgInfo("continue");
+	}
+}
+
+// Starts engine rendering with one of the choosen algorithms (step-based, dda)
+void startAlgTest(Renderer& renderer) {
+
+	char inputBuf[14];	// 'start raycast' string size + 1 to '\0'
+	
+	while (1) {
+		system("cls");
+		showStartAlgInfo("general");
+
+		std::cout << "Input: \n";
+		scanf_s("%13s", inputBuf, (unsigned)_countof(inputBuf));
+
+		if (strcmp(inputBuf, "start raycast") == 0) {
+			renderer.run();
+			break;
+		}
+		else if (strcmp(inputBuf, "start dda") == 0) {
+			std::cout << "DDA is not implemented now" << std::endl;
+			showStartAlgInfo("continue");
+		}
+		else if (strcmp(inputBuf, "info") == 0) {
+			system("cls");
+			showStartAlgInfo("controls");
+		}
+		else if (strcmp(inputBuf, "exit") == 0) {
+			std::cout << "App stopped, goodbye!\n";
+			exit(0);	// instead of break to exit whole app, not just this method
+		}
+	}
+}
+
+
+
+int main() {
 
 	Renderer gameRenderer;
 
-	gameRenderer.run();
+	startAlgTest(gameRenderer);
+	//gameRenderer.run();
 
-	//system("pause>nul");		// Renderer changes console context that conficts with standard one causing start error... WOW
 	return 0;
 }
