@@ -2,6 +2,7 @@
 
 #include "Engine/Renderer.h"
 
+
 namespace Test {
 	namespace Commands {
 		constexpr const char* START = "start";
@@ -17,8 +18,9 @@ namespace Test {
 		Continue
 	};
 
-	//const char* infoPart = "general"
-	void showStartAlgInfo(InfoType type = InfoType::General) {
+
+	// Displays info panels of depended InfoType inside of startAlgTest()
+	void showStartAlgInfo(InfoType type = InfoType::General) {				//const char* infoPart = "general"
 
 		if (type == InfoType::Continue) {
 			std::cout << "Press any key to continue" << std::endl;
