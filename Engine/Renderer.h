@@ -72,6 +72,7 @@ namespace Render {
 		namespace Colors {
 
 			// constexpr color definition instead of magical values in the define or function
+			// WORD = unsigned short in Win type definition
 			constexpr WORD White = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;			// white
 			constexpr WORD BrightWhite = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 			constexpr WORD Yellow = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
