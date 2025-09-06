@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer.h"
+#include "Engine/Engine.h"
 
 
 namespace Test {
@@ -51,7 +51,7 @@ namespace Test {
 
 
 	// Starts engine rendering with one of the choosen algorithms (step-based, dda)
-	void startAlgTest(Renderer& renderer) {
+	void startAlgTest(Engine& engine) {
 
 		const std::size_t MAX_START_INPUT_SIZE = 14;
 		std::string inputBuf;
@@ -68,7 +68,7 @@ namespace Test {
 			std::getline(std::cin, inputBuf);
 
 			if (inputBuf == Commands::START || inputBuf == Commands::START_RAYCAST) {
-				renderer.run();
+				engine.run();
 			}
 			else if (inputBuf == Commands::START_DDA) {
 				std::cout << "DDA is not implemented now" << std::endl;

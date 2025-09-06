@@ -26,3 +26,16 @@ struct fcoord_t {
 		return !(coords1 == coords2);
 	}
 };
+
+
+namespace UtilFunc {
+
+	inline int _min(int a, int b) {
+		return a < b ? a : b;
+	}
+
+	inline int _max(int a, int b) {
+		return a < b ? b : a;
+	}
+
+}

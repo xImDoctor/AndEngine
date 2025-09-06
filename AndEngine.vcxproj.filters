@@ -16,12 +16,18 @@
     <Filter Include="Файлы ресурсов\Notes">
       <UniqueIdentifier>{507f629a-fd8f-4662-88f2-bc914863fcca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\utils">
+      <UniqueIdentifier>{8c6e886b-35fb-4a2a-8cb1-4a12870766eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Renderer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Engine.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -31,6 +37,18 @@
     </ClInclude>
     <ClInclude Include="proj_tests.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Engine.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\render_utils.h">
+      <Filter>Файлы заголовков\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\spawn_utils.h">
+      <Filter>Файлы заголовков\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\common_utils.h">
+      <Filter>Файлы заголовков\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "eng_structs.h"	// coord_t, fcoord_t
+#include "common_utils.h"
 
 
 namespace RenderConst {

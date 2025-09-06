@@ -4,15 +4,9 @@
 // simple raycast algorithm, returns float distance from player to object
 Renderer::Renderer() {
 
-	srand(static_cast<unsigned int>(time(NULL)));
-
-	playerCoord = { 2.0f, 2.0f };
-	playerAngle = 0.0f;
-
 	screenBuffer.resize(RENDER_HEIGHT);	// vector size, not string one
 	for (auto& line : screenBuffer)
 		line.resize(RENDER_WIDTH, ' '); // resize and clear strings
-
 
 	// hide cursor when console is active
 	CONSOLE_CURSOR_INFO cursorInfo;
@@ -21,12 +15,14 @@ Renderer::Renderer() {
 	cursorInfo.bVisible = false;
 	SetConsoleCursorInfo(hConsole, &cursorInfo);
 
-	map = generateMap();
 }
 
 
 // Get drawing symbol for wall based on its distance
-float Renderer::castRay(float rayAngle) {
+float Renderer::castRay(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float rayAngle) {
+
+	int mapHeight = map.size();
+	int mapWidth = mapHeight > 0 ? map[0].size() : 0;
 
 	// angle normalization
 	normalizeAngle(rayAngle);
@@ -50,7 +46,7 @@ float Renderer::castRay(float rayAngle) {
 		rayCoord.y = playerCoord.y + rayDirection.y * distance;
 
 		// check map border
-		if (rayCoord.x < 0 || rayCoord.x >= MAP_WIDTH || rayCoord.y < 0 || rayCoord.y >= MAP_HEIGHT) {
+		if (rayCoord.x < 0 || rayCoord.x >= mapWidth || rayCoord.y < 0 || rayCoord.y >= mapHeight) {
 			isWallHit = true;
 			distance = depth;
 		}
@@ -91,7 +87,7 @@ char Renderer::getObjectSymb(float distance) {
 }
 
 
-void Renderer::setObjectColor(const char symb, const int heightValue = 1) { // predefine with 1 not to use when not written in other code
+void Renderer::setObjectColor(const char symb, const int heightValue) { // predefine with 1 not to use when not written in other code
 
 	switch (symb) {
 		// in-screen walls displaying colors
@@ -131,7 +127,7 @@ void Renderer::setObjectColor(const char symb, const int heightValue = 1) { // p
 
 
 // Main rendering function with all renderable elements implemented
-void Renderer::render() {
+void Renderer::render(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float playerAngle) {
 
 	// removed cls
 	// system("cls");
@@ -142,7 +138,7 @@ void Renderer::render() {
 		float rayAngle = (playerAngle - FOV / 2.0f) + ((float)x / (float)RENDER_WIDTH) * FOV;
 
 		// casting ray to return wall distance
-		float distance = castRay(rayAngle);
+		float distance = castRay(map, playerCoord, rayAngle);
 
 		// fix fish eye effect
 		distance *= cosf(rayAngle - playerAngle);
@@ -169,15 +165,15 @@ void Renderer::render() {
 	}
 
 	// another renderable things here
-	renderPlayerInfo();
-	renderMiniMap();
+	renderPlayerInfo(playerCoord, playerAngle);
+	renderMiniMap(map, playerCoord);
 
 	// draw final buffer to the screen (render -> screen)
 	displayScreen();
 }
 
 
-void Renderer::renderPlayerInfo() {
+void Renderer::renderPlayerInfo(const fcoord_t& playerCoord, float playerAngle) {
 
 	char infoBuf[64];
 	sprintf_s(infoBuf, "X:%.2f Y:%0.2f Angle:%0.2f", playerCoord.x, playerCoord.y, playerAngle);	// setup buffer
@@ -190,8 +186,13 @@ void Renderer::renderPlayerInfo() {
 }
 
 
-void Renderer::renderMiniMap() {
-	int miniMapSize = MINIMAP_SIZE;	// scaled one now
+void Renderer::renderMiniMap(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord) {
+	
+	int mapHeight = map.size();
+	int mapWidth = mapHeight > 0 ? map[0].size() : 0;
+	
+	// get miniMapSize depending on real map sizes (array sizes) and max MINIMAP_SIZE
+	int miniMapSize = UtilFunc::_min(MINIMAP_SIZE, UtilFunc::_max(mapHeight, mapWidth));
 
 	coord_t offset = { RENDER_WIDTH - miniMapSize - 1, 1 };
 
@@ -218,8 +219,8 @@ void Renderer::renderMiniMap() {
 		}
 
 	// info inside of minimap
-	for (int y = 0; y < MAP_HEIGHT && y < miniMapSize; ++y)
-		for (int x = 0; x < MAP_WIDTH && x < miniMapSize; ++x) {
+	for (int y = 0; y < mapHeight && y < miniMapSize; ++y)
+		for (int x = 0; x < mapWidth && x < miniMapSize; ++x) {
 
 			int screenX = offset.x + x;
 			int screenY = offset.y + y;
@@ -233,27 +234,6 @@ void Renderer::renderMiniMap() {
 					screenBuffer[screenY][screenX] = '@';
 			}
 		}
-
-}
-
-
-// render (game right now) runing
-void Renderer::run() {
-	bool isRunning = true;
-
-	system("cls");			// clear window before game drawing
-	while (isRunning) {
-
-		handleInput();
-
-		render();
-
-		// stop render when Esc pressed
-		if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) isRunning = false;
-
-		// sleep time with delay to stabilize frames (~FPS)
-		Sleep(RENDER_DELAY);
-	}
 
 }
 
@@ -293,70 +273,4 @@ void Renderer::displayScreen() {
 
 	Render::Utils::setDefaultColor();
 	std::cout.flush(); // removed cls so flush out buffer directly
-}
-
-
-// Generate in-scene map randomly
-std::vector<std::vector<char>> Renderer::generateMap() {
-
-	std::vector<std::vector<char>> newMap(MAP_HEIGHT, std::vector<char>(MAP_WIDTH));
-
-	for (int i = 0; i < MAP_HEIGHT; ++i) {
-
-		for (int j = 0; j < MAP_WIDTH; ++j) {
-
-			if (!i || !j || j == MAP_WIDTH - 1 || i == MAP_HEIGHT - 1)
-				newMap[i][j] = Render::Objects::WALL;	// coz dimentions are presized now
-			else
-				newMap[i][j] = Render::Objects::PATH;
-		}
-	}
-
-	coord_t coords = { 2, 2 };	// border is already made, and second cell used for player spawn right now
-
-	// randomly spawn walls
-	for (int i = coords.x; i < MAP_HEIGHT - 2; ++i)
-		for (int j = coords.y; j < MAP_WIDTH - 2; ++j) {
-			coord_t spawnCoords = { i , j };
-
-			//if (RenderObjects::isWallSpawnable(spawnCoords, MAP_HEIGHT, MAP_WIDTH))
-			if (SpawnUtils::isWallPercentSpawnable(spawnCoords, 30))		// 40% by default
-				newMap[i][j] = Render::Objects::WALL;
-		}
-
-	newMap[coords.x][coords.y] = Render::Objects::PATH;
-
-	return newMap;
-}
-
-
-// User input processing
-void Renderer::handleInput() {
-
-	// rotate to A-D
-	// move forward-backward to W-S
-	if (GetAsyncKeyState('A') & 0x8000)
-		playerAngle -= ROTATION_SPEED;
-	else if (GetAsyncKeyState('D') & 0x8000)
-		playerAngle += ROTATION_SPEED;
-	else {
-
-		fcoord_t newPlayerCoord = playerCoord;
-
-		if (GetAsyncKeyState('W') & 0x8000) {
-
-			newPlayerCoord.x = playerCoord.x + cosf(playerAngle) * MOVEMENT_SPEED;
-			newPlayerCoord.y = playerCoord.y + sinf(playerAngle) * MOVEMENT_SPEED;
-		}
-		else if (GetAsyncKeyState('S') & 0x8000) {
-
-			newPlayerCoord.x = playerCoord.x - cosf(playerAngle) * MOVEMENT_SPEED;
-			newPlayerCoord.y = playerCoord.y - sinf(playerAngle) * MOVEMENT_SPEED;
-		}
-
-		if (map[(int)newPlayerCoord.y][(int)newPlayerCoord.x] == Render::Objects::PATH)
-			playerCoord = newPlayerCoord;
-
-		normalizeAngle(playerAngle);
-	}
 }

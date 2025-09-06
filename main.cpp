@@ -7,8 +7,10 @@
 
 int main() {
 
-	Renderer gameRenderer;
-	Test::startAlgTest(gameRenderer);
+	//Renderer gameRenderer;
+	Engine gameEngine;
+
+	Test::startAlgTest(gameEngine);
 
 	return 0;
 }
