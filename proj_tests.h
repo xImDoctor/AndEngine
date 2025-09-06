@@ -44,7 +44,9 @@ namespace Test {
 				"\nDemonstration starts on the randomly generated map" << std::endl << std::endl;
 			std::cout << "Controls:\n- W/S - move forward/backward\n- A/D - rotate camera to left/right\n- Esc - stop (leave) rendering" << std::endl << std::endl;
 			std::cout << "Other info:\n- Wall symbols and colors are different based on distance towards it\n-There is the minimap of created scene in the upper-right corner" << std::endl;
-
+			std::cout << "---" << std::endl;
+			std::cout << "[CAUTION] Maybe you should minimize your console scale (ctrl+mouse_wheel for example) when rendering starts" <<
+				" because render field might be larger then default console size" << std::endl;
 			showStartAlgInfo(InfoType::Continue);
 		}
 	}
