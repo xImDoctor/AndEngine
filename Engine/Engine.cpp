@@ -9,16 +9,16 @@ void Engine::run() {
 	while (isRunning) {
 
 		handleInput();
-		renderer.render(map, playerCoord, playerAngle);
-
 		// stop render when Esc pressed
-		if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) 
+		if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
 			isRunning = false;
+
+
+		renderer.render(map, playerCoord, playerAngle);
 
 		// sleep time with delay to stabilize frames (~FPS)
 		Sleep(renderer.getRenderDelay());
 	}
-
 }
 
 
