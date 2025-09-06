@@ -8,7 +8,7 @@
 int main() {
 
 	Renderer gameRenderer;
-	startAlgTest(gameRenderer);
+	Test::startAlgTest(gameRenderer);
 
 	return 0;
 }

@@ -29,6 +29,9 @@
     <ClInclude Include="Engine\Renderer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="proj_tests.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Notes\RendererOptimizationBeforeRefactoring.md">
