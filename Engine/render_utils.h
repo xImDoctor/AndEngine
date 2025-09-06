@@ -48,30 +48,12 @@ namespace Render {
 
 	namespace Utils {
 
-		void MoveToXY(int x, int y) {
+		void MoveToXY(int x, int y);
+		void MoveToXY(const coord_t& coords);
 
-			COORD pos = { static_cast<SHORT>(x), static_cast<SHORT>(y) };
-
-			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleCursorPosition(output, pos);
-		}
-
-		void MoveToXY(const coord_t& coords) {
-
-			COORD pos = { static_cast<SHORT>(coords.x), static_cast<SHORT>(coords.y) };
-
-			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleCursorPosition(output, pos);
-		}
-
-		void SetTextColor(int color) {
-
-			HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-			SetConsoleTextAttribute(hConsole, color);
-		}
+		void SetTextColor(int color);
 
 		namespace objColors = ::Render::Objects::Colors;
-
 		// set default color inline function instead of pre-defined macro
 		inline void setDefaultColor() {
 			SetTextColor(objColors::White);
