@@ -21,8 +21,8 @@ Renderer::Renderer() {
 // Get drawing symbol for wall based on its distance
 float Renderer::castRay(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float rayAngle) {
 
-	int mapHeight = map.size();
-	int mapWidth = mapHeight > 0 ? map[0].size() : 0;
+	int mapHeight = static_cast<int>(map.size());
+	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
 
 	// angle normalization
 	normalizeAngle(rayAngle);
@@ -52,7 +52,7 @@ float Renderer::castRay(const std::vector<std::vector<char>>& map, const fcoord_
 		}
 		else {
 			// check if wall is hit
-			coord_t mapCoord = { (int)rayCoord.x, (int)rayCoord.y };
+			coord_t mapCoord = { static_cast<int>(rayCoord.x), static_cast<int>(rayCoord.y) };
 			if (map[mapCoord.y][mapCoord.x] == Render::Objects::WALL)
 				isWallHit = true;
 		}
@@ -67,8 +67,8 @@ float Renderer::castRay(const std::vector<std::vector<char>>& map, const fcoord_
 // predefine with 1 not to use when not written in other code
 char Renderer::getObjectSymb(float distance) {
 
-	static const char symbs[] = { ' ', '#', 'X', 'O', 'x', ' - ', '.' };				// nothing as 0
-	static constexpr int symbArrSize = (int)(sizeof(symbs) / (sizeof(symbs[0])));	// to know it when compiled
+	static const char symbs[] = { ' ', '#', 'X', 'O', 'x', '-', '.' };				// nothing as 0
+	static constexpr int symbArrSize = static_cast<int>((sizeof(symbs) / (sizeof(symbs[0]))));	// to know it when compiled
 	static const float distLimits[] = {
 		depth / 4.0f,					// too short dist
 		depth / 3.5f,
@@ -188,8 +188,8 @@ void Renderer::renderPlayerInfo(const fcoord_t& playerCoord, float playerAngle) 
 
 void Renderer::renderMiniMap(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord) {
 	
-	int mapHeight = map.size();
-	int mapWidth = mapHeight > 0 ? map[0].size() : 0;
+	int mapHeight = static_cast<int>(map.size());
+	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
 	
 	// get miniMapSize depending on real map sizes (array sizes) and max MINIMAP_SIZE
 	int miniMapSize = UtilFunc::_min(MINIMAP_SIZE, UtilFunc::_max(mapHeight, mapWidth));
