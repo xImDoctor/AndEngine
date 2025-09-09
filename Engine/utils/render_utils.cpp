@@ -17,7 +17,7 @@ void Render::Utils::MoveToXY(const coord_t& coords) {
 	SetConsoleCursorPosition(output, pos);
 }
 
-void Render::Utils::SetTextColor(int color) {
+void Render::Utils::SetTextColor(WORD color) {
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, color);

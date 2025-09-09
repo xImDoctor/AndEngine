@@ -16,7 +16,7 @@
 
 #include "utils/common_utils.h"
 #include "utils/render_utils.h"	// namespace RenderConsts, Render (Utils, Objects::Colors)
-
+#include "utils/math_utils.h"
 
 // Base raycasting system - Console Raycaster
 class Renderer {
@@ -29,7 +29,7 @@ class Renderer {
 
 	static constexpr int RENDER_DELAY = 50;		// ms, reduced to increase FPS
 
-	static constexpr float FOV = RenderConst::Math::QUART_PI;	// field of view, pi/4
+	static constexpr float FOV = MathUtils::Consts::QUART_PI;	// field of view, pi/4
 	static constexpr float depth = 16.0f;						// max render distance
 	
 	// use string as simple console buffer
@@ -72,7 +72,7 @@ private:
 // class utils:
 
 	// Normalize angle to [0; 2pi]
-	void normalizeAngle(float& angle);
+	void normalizeAngle(float& angle);	// uses math_utils.h now
 
 	// Clears screenBuffer
 	void clearScreenBuffer();

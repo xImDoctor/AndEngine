@@ -90,6 +90,5 @@ void Engine::handleInput() {
 
 // normalize angle to [0; 2pi]
 void Engine::normalizeAngle(float& angle) {
-	while (angle < 0) angle += RenderConst::Math::TWO_PI;
-	while (angle >= RenderConst::Math::TWO_PI) angle -= RenderConst::Math::TWO_PI;
+	MathUtils::Angles::normalizeAngle(angle);
 }

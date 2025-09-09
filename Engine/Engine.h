@@ -2,6 +2,8 @@
 
 #include "utils/common_utils.h"
 #include "utils/spawn_utils.h"
+#include "utils/math_utils.h"
+
 #include "Renderer.h"
 
 class Engine {

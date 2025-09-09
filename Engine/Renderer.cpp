@@ -192,7 +192,7 @@ void Renderer::renderMiniMap(const std::vector<std::vector<char>>& map, const fc
 	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
 	
 	// get miniMapSize depending on real map sizes (array sizes) and max MINIMAP_SIZE
-	int miniMapSize = UtilFunc::_min(MINIMAP_SIZE, UtilFunc::_max(mapHeight, mapWidth));
+	int miniMapSize = MathUtils::Func::_min(MINIMAP_SIZE, MathUtils::Func::_max(mapHeight, mapWidth));
 
 	coord_t offset = { RENDER_WIDTH - miniMapSize - 1, 1 };
 
@@ -240,8 +240,7 @@ void Renderer::renderMiniMap(const std::vector<std::vector<char>>& map, const fc
 
 // normalize angle to [0; 2pi]
 void Renderer::normalizeAngle(float& angle) {
-	while (angle < 0) angle += RenderConst::Math::TWO_PI;
-	while (angle >= RenderConst::Math::TWO_PI) angle -= RenderConst::Math::TWO_PI;
+	MathUtils::Angles::normalizeAngle(angle);
 }
 
 // Clears screenBuffer
