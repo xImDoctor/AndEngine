@@ -35,6 +35,9 @@ class Renderer {
 	// use string as simple console buffer
 	std::vector<std::string> screenBuffer;
 
+	// console handler moved here
+	HANDLE hConsole;
+
 public:
 
 	Renderer();

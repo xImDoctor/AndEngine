@@ -8,9 +8,11 @@ Renderer::Renderer() {
 	for (auto& line : screenBuffer)
 		line.resize(RENDER_WIDTH, ' '); // resize and clear strings
 
+	// setup console handle
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
 	// hide cursor when console is active
 	CONSOLE_CURSOR_INFO cursorInfo;
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetConsoleCursorInfo(hConsole, &cursorInfo);
 	cursorInfo.bVisible = false;
 	SetConsoleCursorInfo(hConsole, &cursorInfo);
@@ -92,34 +94,34 @@ void Renderer::setObjectColor(const char symb, const int heightValue) { // prede
 	switch (symb) {
 		// in-screen walls displaying colors
 	case '#':
-		Render::Utils::SetTextColor(Render::Objects::Colors::BrightWhite);
+		Render::Utils::SetTextColor(Render::Objects::Colors::BrightWhite, hConsole);
 		break;
 	case 'X':
 		if (!heightValue)	// if this is first line (y=0) where player info located
-			Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
+			Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen, hConsole);
 		else // 'X' as wall symbol
-			Render::Utils::SetTextColor(Render::Objects::Colors::White); // white
+			Render::Utils::SetTextColor(Render::Objects::Colors::White, hConsole); // white
 		break;
 	case 'O':
-		Render::Utils::SetTextColor(Render::Objects::Colors::RedGreen);
+		Render::Utils::SetTextColor(Render::Objects::Colors::RedGreen, hConsole);
 		break;
 	case 'x':
-		Render::Utils::SetTextColor(Render::Objects::Colors::RedBlue);
+		Render::Utils::SetTextColor(Render::Objects::Colors::RedBlue, hConsole);
 		break;
 	case '-':
-		Render::Utils::SetTextColor(Render::Objects::Colors::Blue);
+		Render::Utils::SetTextColor(Render::Objects::Colors::Blue, hConsole);
 		break;
 	case '.':
-		Render::Utils::setDefaultColor();
+		Render::Utils::setDefaultColor(hConsole);
 		break;
 	case '@':
-		Render::Utils::SetTextColor(Render::Objects::Colors::BrightRed);
+		Render::Utils::SetTextColor(Render::Objects::Colors::BrightRed, hConsole);
 		break;
 	default:
 
 		if (isalpha(symb) || isdigit(symb))		// zero-line player info, recolor only text/nums
-			Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
-		else Render::Utils::setDefaultColor();
+			Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen, hConsole);
+		else Render::Utils::setDefaultColor(hConsole);
 		break;
 	}
 
@@ -256,9 +258,9 @@ void Renderer::displayScreen() {
 
 	//clearScreenBuffer();
 
-	Render::Utils::MoveToXY(0, 0);
+	Render::Utils::MoveToXY(0, 0, hConsole);
 	for (int y = 0; y < RENDER_HEIGHT; ++y) {
-		Render::Utils::MoveToXY(0, y);		// move to start of every Y line
+		Render::Utils::MoveToXY(0, y, hConsole);		// move to start of every Y line
 
 		for (int x = 0; x < RENDER_WIDTH; ++x) {
 

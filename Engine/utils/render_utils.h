@@ -38,12 +38,20 @@ namespace Render {
 		void MoveToXY(int x, int y);
 		void MoveToXY(const coord_t& coords);
 
+		void MoveToXY(int x, int y, HANDLE outHandle);
+		void MoveToXY(const coord_t& coords, HANDLE outHandle);
+
 		void SetTextColor(WORD color);
+		void SetTextColor(WORD color, HANDLE outHandle);
 
 		namespace objColors = ::Render::Objects::Colors;
 		// set default color inline function instead of pre-defined macro
 		inline void setDefaultColor() {
 			SetTextColor(objColors::White);
+		}
+
+		inline void setDefaultColor(HANDLE outHandle) {
+			SetTextColor(objColors::White, outHandle);
 		}
 	}
 }

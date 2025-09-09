@@ -129,15 +129,16 @@
   <ItemGroup>
     <ClCompile Include="Engine\Engine.cpp" />
     <ClCompile Include="Engine\Renderer.cpp" />
-    <ClCompile Include="Engine\render_utils.cpp" />
+    <ClCompile Include="Engine\utils\render_utils.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\common_utils.h" />
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\Renderer.h" />
-    <ClInclude Include="Engine\render_utils.h" />
-    <ClInclude Include="Engine\spawn_utils.h" />
+    <ClInclude Include="Engine\utils\common_utils.h" />
+    <ClInclude Include="Engine\utils\render_utils.h" />
+    <ClInclude Include="Engine\utils\spawn_utils.h" />
+    <ClInclude Include="Engine\utils\math_utils.h" />
     <ClInclude Include="proj_tests.h" />
   </ItemGroup>
   <ItemGroup>
