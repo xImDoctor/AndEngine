@@ -1,9 +1,8 @@
 #pragma once
 
-#include "common_utils.h"
-#include "spawn_utils.h"
+#include "utils/common_utils.h"
+#include "utils/spawn_utils.h"
 #include "Renderer.h"
-#include ""
 
 class Engine {
 
@@ -15,8 +14,8 @@ class Engine {
 	// array to store game map
 	std::vector<std::vector<char>> map;			// MAP_HEIGHT x MAP_WIDTH
 
-	//static constexpr float MOVEMENT_SPEED = 0.25f;
-	//static constexpr float ROTATION_SPEED = 0.3f;
+	static constexpr float MOVEMENT_SPEED = 0.25f;
+	static constexpr float ROTATION_SPEED = 0.25f;
 
 	// game map array size
 	static constexpr int MAP_HEIGHT = 16;

@@ -14,8 +14,8 @@
 #include <cstdio>
 #include <iostream>
 
-#include "common_utils.h"
-#include "render_utils.h"	// namespace RenderConsts, Render (Utils, Objects::Colors)
+#include "utils/common_utils.h"
+#include "utils/render_utils.h"	// namespace RenderConsts, Render (Utils, Objects::Colors)
 
 
 // Base raycasting system - Console Raycaster
