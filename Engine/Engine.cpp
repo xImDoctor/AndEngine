@@ -2,7 +2,7 @@
 
 
 // Game cycle running
-void Engine::run() {
+void Engine::run(bool use_DDA_render) {
 
 	system("cls");			// clear window before game drawing
 
@@ -14,7 +14,7 @@ void Engine::run() {
 			isRunning = false;
 
 
-		renderer.render(map, playerCoord, playerAngle);
+		renderer.render(map, playerCoord, playerAngle, use_DDA_render);
 
 		// sleep time with delay to stabilize frames (~FPS)
 		Sleep(renderer.getRenderDelay());

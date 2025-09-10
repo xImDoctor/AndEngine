@@ -73,8 +73,10 @@ namespace Test {
 				engine.run();
 			}
 			else if (inputBuf == Commands::START_DDA) {
-				std::cout << "DDA is not implemented now" << std::endl;
-				showStartAlgInfo(InfoType::Continue);
+
+				engine.run(true);	// use DDA flag enabled
+				/*std::cout << "DDA is not implemented now" << std::endl;
+				showStartAlgInfo(InfoType::Continue);*/
 			}
 			else if (inputBuf == Commands::INFO) {
 				system("cls");

@@ -36,7 +36,8 @@ public:
 	}
 
 	// run game-cycle
-	void run();
+	// with flag to switch between sizeStepped and DDA renders
+	void run(bool use_DDA_render = false);
 
 	// show created/choosen map (for debug, not for player)
 	void showMap() const {

@@ -4,12 +4,14 @@
 
 #include <vector>
 #include <string>
-#include <algorithm> // fill
+#include <algorithm>	// fill
+
+#include <limits>		// numeric_limits
 
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-#include <cctype>	// ctype.h
+#include <cctype>		// ctype.h
 
 #include <cstdio>
 #include <iostream>
@@ -47,8 +49,9 @@ public:
 	//void run();
 
 	// Main rendering function with all renderable elements implemented
-	// runs rendering now
-	void render(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float playerAngle);	
+	// Flag useDDA = true enables DDA raycast algorithm else function uses stepped one.
+	// Stepped one choosen by default (useDDA = false)
+	void render(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float playerAngle, bool useDDA = false);	
 
 	// info rendering
 	void renderPlayerInfo(const fcoord_t& playerCoord, float playerAngle);
@@ -62,7 +65,13 @@ public:
 private:
 
 	// simple raycast algorithm, returns float distance from player to object
-	float castRay(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float rayAngle);
+	float castRay_stepped(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float rayAngle);
+
+	// Implementation of faster DDA raycast algorithm (improve x10)
+	// Optimized algorithm that crosses grid from one cell to second with one step only.
+	// Guaranteed to visit every cell in the ray path once
+	float castRay_dda(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float rayAngle);
+
 
 	// Get drawing symbol for wall based on its distance
 	char getObjectSymb(float distance);
