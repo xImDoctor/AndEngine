@@ -6,6 +6,7 @@ void Engine::run(bool use_DDA_render) {
 
 	system("cls");			// clear window before game drawing
 
+	isRunning = true;
 	while (isRunning) {
 
 		handleInput();
