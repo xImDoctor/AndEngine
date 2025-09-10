@@ -60,8 +60,9 @@ In the current version used `Visual Studio 2022`, you can clone/download this re
 - [x] Raycasting renderer
 - [x] Basic player movement
 - [x] Simple map loading
+- [x] Map generation with seed
 - [ ] Enhanced map structure with tile properties
-- [ ] Collision detection system
+- [ ] Collision detection system (*partly - wall collision*)
 
 ### Phase 2: Graphics Enhancement
 - [ ] SDL2 integration
@@ -98,12 +99,19 @@ In the current version used `Visual Studio 2022`, you can clone/download this re
 ## 📚 Technical Details
 
 ### Raycasting Algorithm
-The engine uses a step-based raycasting algorithm:
+The engine renderer now works with **step-based raycasting** and **DDA algorithms**
+
+#### Step-based algorithm
 1. Cast rays from player position at different angles
 2. Step along each ray until hitting a wall
 3. Calculate wall height based on distance
 4. Apply fish-eye correction
 5. Render column with distance-based shading
+
+#### DDA algorithm
+Besides step-based one, implemented optimized (*faster*) algorithm that crosses the grid from one cell to second with one step only. 
+Guaranteed to visit every cell in the ray path once.
+
 
 ## 🎯 Goals
 - **Educational**: Learn game engine development from scratch with `C/C++`
