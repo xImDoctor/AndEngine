@@ -19,6 +19,9 @@
     <Filter Include="Файлы заголовков\utils">
       <UniqueIdentifier>{92150392-19bc-46ba-810f-a6afd43262c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\utils">
+      <UniqueIdentifier>{cdeda1b1-11db-4697-99de-9ee8f8614aab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -31,7 +34,10 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Engine\utils\render_utils.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\utils\common_utils.cpp">
+      <Filter>Исходные файлы\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

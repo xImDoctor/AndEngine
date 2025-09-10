@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="Engine\Engine.cpp" />
     <ClCompile Include="Engine\Renderer.cpp" />
+    <ClCompile Include="Engine\utils\common_utils.cpp" />
     <ClCompile Include="Engine\utils\render_utils.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

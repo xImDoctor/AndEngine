@@ -1,5 +1,9 @@
 #pragma once
-
+#include <iostream>
+#include <limits>
+#include <cctype>
+#include <exception>
+#include <string>
 
 struct coord_t {
 	int x, y;
@@ -27,3 +31,16 @@ struct fcoord_t {
 	}
 };
 
+
+namespace StreamUtils {
+
+	// Clears input stream to prevent errors with its buffer
+	void clearInputStream();
+	void softClearInputStream();
+
+	// Input unsigned int in the safety, especially for proj_tests.h
+	// Idea: we input string and check if this is number, then try to cast uint 
+	//			after stoul (string to unsigned long)
+	// Returns input success status
+	bool safeInputUInt(unsigned int& val);
+}

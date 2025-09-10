@@ -15,6 +15,7 @@ class Engine {
 
 	// array to store game map
 	std::vector<std::vector<char>> map;			// MAP_HEIGHT x MAP_WIDTH
+	unsigned int mapSeed;
 
 	static constexpr float MOVEMENT_SPEED = 0.25f;
 	static constexpr float ROTATION_SPEED = 0.25f;
@@ -23,16 +24,18 @@ class Engine {
 	static constexpr int MAP_HEIGHT = 16;
 	static constexpr int MAP_WIDTH = 16;
 
-	Renderer renderer;	// Renderer class object: renderer.render()
+	Renderer renderer;	// Renderer class object: renderer.render(useDDA = false)
 
 	bool isRunning;
 
 public:
 
-	Engine() : playerCoord({ 2.0f, 2.0f }), playerAngle(0.0f), isRunning(true) {
+	Engine() : playerCoord({ 2.0f, 2.0f }), playerAngle(0.0f), isRunning(true),
+	mapSeed(static_cast<unsigned int>(time(NULL))) {
 
-		srand(static_cast<unsigned int>(time(NULL)));
-		map = generateMap();
+		regenerateMap();
+		//srand(mapSeed);
+		//map = generateMap();
 	}
 
 	// run game-cycle
@@ -50,9 +53,19 @@ public:
 	}
 
 // getters for Renderer:
-	const std::vector<std::vector<char>>& getMap() const { return map; }
-	const fcoord_t& getPlayerCoord() const { return playerCoord; }
-	float getPlayerAngle() const { return playerAngle; }
+	inline const std::vector<std::vector<char>>& getMap() const { return map; }
+	inline const fcoord_t& getPlayerCoord() const { return playerCoord; }
+	inline float getPlayerAngle() const { return playerAngle; }
+	inline unsigned int getMapSeed() const { return mapSeed; }
+
+// setters
+
+	// use your own seed another from random one, also regenerates map with new random
+	void changeMapSeed(unsigned int newSeed) {
+		mapSeed = newSeed;
+		regenerateMap();
+	}
+
 
 private:
 	
@@ -64,5 +77,11 @@ private:
 
 	// Normalize angle to [0; 2pi]
 	void normalizeAngle(float& angle);
+
+	// Regenerate map with choosen seed
+	void regenerateMap() {
+		srand(mapSeed);
+		map = generateMap();
+	}
 
 };
