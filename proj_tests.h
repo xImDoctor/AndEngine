@@ -35,10 +35,15 @@ namespace Test {
 			std::cout << "AndEngine renderer test." << std::endl;
 			std::cout << "Type one of the following commands:" << std::endl;
 
-			std::cout << "start, start raycast - starts console rendering with step-based raycast" << std::endl;
+			std::cout << std::endl << "Start rendering:" << std::endl;
+			std::cout << "start raycast - starts console rendering with step-based raycast" << std::endl;
 			std::cout << "start dda - starts console rendering with DDA Raycasting algorithm" << std::endl; // faster one
+			
+			std::cout << std::endl << "Map generator:" << std::endl;
 			std::cout << "change seed - opens seed settings" << std::endl;
 			std::cout << "show map - displays pre-generated game map" << std::endl;
+			
+			std::cout << std::endl << "How to use and logout:" << std::endl;
 			std::cout << "info - information about in-scene data and controls" << std::endl;
 			std::cout << "exit - stop this application" << std::endl;
 		}
@@ -67,11 +72,9 @@ namespace Test {
 			system("cls");
 			showStartAlgInfo(InfoType::General);
 
-			std::cout << "Input: \n";
-
-
-			//if (std::cin.peek() != EOF && std::cin.peek() != '\n')
-			//	StreamUtils::clearInputStream();
+			Render::Utils::SetTextColor(Render::Objects::Colors::Yellow);
+			std::cout << std::endl << "Your input: ";
+			Render::Utils::setDefaultColor();
 
 			inputBuf.clear();
 			std::getline(std::cin, inputBuf);
@@ -81,15 +84,11 @@ namespace Test {
 			if (inputBuf.size() > MAX_START_INPUT_SIZE)
 				inputBuf.resize(MAX_START_INPUT_SIZE);
 
-			if (inputBuf == Commands::START || inputBuf == Commands::START_RAYCAST) {
+			if (inputBuf == Commands::START_RAYCAST) {
 				engine.run();
-				//StreamUtils::softClearInputStream();
-				//Sleep(100);
 			}
 			else if (inputBuf == Commands::START_DDA) {
 				engine.run(true);	// use DDA flag enabled
-				//StreamUtils::softClearInputStream();
-				//Sleep(100);
 			}
 			else if (inputBuf == Commands::CHANGE_SEED) {
 				unsigned int newSeed;
