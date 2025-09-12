@@ -135,6 +135,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h" />
+    <ClInclude Include="Engine\InputController.h" />
+    <ClInclude Include="Engine\MapGenerator.h" />
     <ClInclude Include="Engine\Renderer.h" />
     <ClInclude Include="Engine\utils\common_utils.h" />
     <ClInclude Include="Engine\utils\render_utils.h" />

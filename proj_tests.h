@@ -104,7 +104,7 @@ namespace Test {
 					if (!newSeed)
 						continue;
 
-					engine.changeMapSeed(newSeed);
+					engine.useMapGenerator().changeMapSeed(newSeed);
 					std::cout << "Seed successfully changed!" << std::endl;
 				}
 				else
@@ -116,7 +116,7 @@ namespace Test {
 				system("cls");
 				std::cout << "Current map seed: " << engine.getMapSeed() << std::endl;
 				std::cout << "Pre-generated game map:" << std::endl;
-				engine.showMap();
+				engine.useMapGenerator().showMap();
 				showStartAlgInfo(InfoType::Continue);
 			}
 			else if (inputBuf == Commands::INFO) {

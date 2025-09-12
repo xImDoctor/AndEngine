@@ -8,8 +8,6 @@
 
 #include <limits>		// numeric_limits
 
-#include <cstdlib>
-#include <ctime>
 #include <cmath>
 #include <cctype>		// ctype.h
 
