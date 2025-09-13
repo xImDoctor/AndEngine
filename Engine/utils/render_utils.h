@@ -4,19 +4,6 @@
 #include "common_utils.h"
 
 
-namespace RenderConst {
-
-	// simplified (shorten) Pi pre-defined, not const from math.h
-	// also other values with Pi radian
-	namespace Math {
-		static constexpr float PI = 3.1415926535f;		// Pi
-		static constexpr float TWO_PI = PI * 2.0f;		// 2Pi
-		static constexpr float HALF_PI = PI * 0.5f;		// Pi/2
-		static constexpr float QUART_PI = PI * 0.25f;	// Pi/4
-	}
-}
-
-
 namespace Render {
 
 	namespace Objects {
@@ -51,12 +38,20 @@ namespace Render {
 		void MoveToXY(int x, int y);
 		void MoveToXY(const coord_t& coords);
 
-		void SetTextColor(int color);
+		void MoveToXY(int x, int y, HANDLE outHandle);
+		void MoveToXY(const coord_t& coords, HANDLE outHandle);
+
+		void SetTextColor(WORD color);
+		void SetTextColor(WORD color, HANDLE outHandle);
 
 		namespace objColors = ::Render::Objects::Colors;
 		// set default color inline function instead of pre-defined macro
 		inline void setDefaultColor() {
 			SetTextColor(objColors::White);
+		}
+
+		inline void setDefaultColor(HANDLE outHandle) {
+			SetTextColor(objColors::White, outHandle);
 		}
 	}
 }

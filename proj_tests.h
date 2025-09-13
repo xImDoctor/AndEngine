@@ -5,11 +5,16 @@
 
 namespace Test {
 	namespace Commands {
-		constexpr const char* START = "start";
 		constexpr const char* START_RAYCAST = "start raycast";
 		constexpr const char* START_DDA = "start dda";
+
 		constexpr const char* INFO = "info";
 		constexpr const char* EXIT = "exit";
+
+		constexpr const char* CHANGE_SEED = "change seed";
+		constexpr const char* SHOW_MAP = "show map";
+
+		constexpr const char* SHOW_TRIG = "show trig";	// show trigonometry (sin, cos) tables
 	}
 
 	enum class InfoType {
@@ -33,8 +38,15 @@ namespace Test {
 			std::cout << "AndEngine renderer test." << std::endl;
 			std::cout << "Type one of the following commands:" << std::endl;
 
-			std::cout << "start, start raycast - starts console rendering with step-based raycast" << std::endl;
+			std::cout << std::endl << "Start rendering:" << std::endl;
+			std::cout << "start raycast - starts console rendering with step-based raycast" << std::endl;
 			std::cout << "start dda - starts console rendering with DDA Raycasting algorithm" << std::endl; // faster one
+			
+			std::cout << std::endl << "Map generator:" << std::endl;
+			std::cout << "change seed - opens seed settings" << std::endl;
+			std::cout << "show map - displays pre-generated game map" << std::endl;
+			
+			std::cout << std::endl << "How to use and logout:" << std::endl;
 			std::cout << "info - information about in-scene data and controls" << std::endl;
 			std::cout << "exit - stop this application" << std::endl;
 		}
@@ -60,20 +72,57 @@ namespace Test {
 
 		while (1) {
 
-			if (inputBuf.size() > MAX_START_INPUT_SIZE)
-				inputBuf.resize(MAX_START_INPUT_SIZE);
-
 			system("cls");
 			showStartAlgInfo(InfoType::General);
 
-			std::cout << "Input: \n";
+			Render::Utils::SetTextColor(Render::Objects::Colors::Yellow);
+			std::cout << std::endl << "Your input: ";
+			Render::Utils::setDefaultColor();
+
+			inputBuf.clear();
 			std::getline(std::cin, inputBuf);
 
-			if (inputBuf == Commands::START || inputBuf == Commands::START_RAYCAST) {
+
+			// limit string size after input
+			if (inputBuf.size() > MAX_START_INPUT_SIZE)
+				inputBuf.resize(MAX_START_INPUT_SIZE);
+
+			if (inputBuf == Commands::START_RAYCAST) {
 				engine.run();
 			}
 			else if (inputBuf == Commands::START_DDA) {
-				std::cout << "DDA is not implemented now" << std::endl;
+				engine.run(true);	// use DDA flag enabled
+			}
+			else if (inputBuf == Commands::SHOW_TRIG) {
+				engine.showPrecomputedTrigVals();
+				showStartAlgInfo(InfoType::Continue);
+			}
+			else if (inputBuf == Commands::CHANGE_SEED) {
+				unsigned int newSeed;
+
+				system("cls");
+				std::cout << "Current map seed=" << engine.getMapSeed() << std::endl;
+				std::cout << "Input new integer seed value (0 to exit without changes):" << std::endl;
+				std::cout << "Seed="; 
+				
+				if (StreamUtils::safeInputUInt(newSeed)) {
+
+					if (!newSeed)
+						continue;
+
+					engine.useMapGenerator().changeMapSeed(newSeed);
+					std::cout << "Seed successfully changed!" << std::endl;
+				}
+				else
+					std::cerr << "Invalid input! Enter a valid positive integer.\n";
+
+				showStartAlgInfo(InfoType::Continue);
+			}
+			else if (inputBuf == Commands::SHOW_MAP) {
+				system("cls");
+				std::cout << "Current map seed: " << engine.getMapSeed() << std::endl;
+				std::cout << "Pre-generated game map:" << std::endl;
+				engine.useMapGenerator().showMap();
 				showStartAlgInfo(InfoType::Continue);
 			}
 			else if (inputBuf == Commands::INFO) {

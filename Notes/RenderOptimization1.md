@@ -1,5 +1,5 @@
 
-# Renderer Optimizations before class refactoring
+# Renderer-Optimizations-1
 For **branch**: `renderer-optimization-1`
 
 ## Priorities
@@ -29,10 +29,10 @@ Optimization of `map` access
 5. Condition simplification and etc
 
 ### Solved problems
-- [ ] Raycasting
-- [ ] Optimized trigonometry
+- [x] Raycasting
+- [x] Optimized trigonometry
 - [x] Moved evals to consts, etc
-- [ ] Redrawing
+- [ ] ~~Redrawing~~ (*buffer optimization, butit is planned to migrate from console*)
 - [x] Data stucrutures changed
 - [x] Conditions simplified (*additionally*)
 
