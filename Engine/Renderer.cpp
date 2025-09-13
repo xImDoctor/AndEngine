@@ -27,13 +27,16 @@ float Renderer::castRay_stepped(const std::vector<std::vector<char>>& map, const
 	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
 
 	// angle normalization
-	normalizeAngle(rayAngle);
+	//normalizeAngle(rayAngle);	// inside of precomputed search now
 
 	fcoord_t rayCoord = playerCoord;	// cast rays from player pos
 
 	fcoord_t rayDirection;
-	rayDirection.x = cosf(rayAngle);
-	rayDirection.y = sinf(rayAngle);
+
+	// use precomputed values
+	//rayDirection.x = cosf(rayAngle);
+	//rayDirection.y = sinf(rayAngle);
+	rayDirection = { getCachedCos(rayAngle), getCachedSin(rayAngle) };
 
 	float distance = 0.0f;
 	float stepSize = 0.01f;  // ray step size
@@ -75,10 +78,12 @@ float Renderer::castRay_dda(const std::vector<std::vector<char>>& map, const fco
 		return depth;
 
 
-	normalizeAngle(rayAngle);
+	// use cached values instead
+	//normalizeAngle(rayAngle);
+	//fcoord_t rayDirection = { cosf(rayAngle), sinf(rayAngle) };
 
+	fcoord_t rayDirection = { getCachedCos(rayAngle), getCachedSin(rayAngle)};
 	fcoord_t rayCoord = playerCoord;
-	fcoord_t rayDirection = { cosf(rayAngle), sinf(rayAngle) };
 
 	// which box of the map (grid) we are in; int coord struct
 	coord_t mapCoord = { static_cast<int>(rayCoord.x), static_cast<int>(rayCoord.y) };
@@ -372,4 +377,54 @@ void Renderer::displayScreen() {
 
 	Render::Utils::setDefaultColor();
 	std::cout.flush(); // removed cls so flush out buffer directly
+}
+
+
+// Computes sin, cos values via compilation, not to compute it every raycasting step
+void Renderer::precomputeTrigTables() {
+
+	cosTable.clear();
+	sinTable.clear();
+	cosTable.reserve(TRIG_TABLE_SIZE);
+	sinTable.reserve(TRIG_TABLE_SIZE);
+
+	angleStep = MathUtils::Consts::TWO_PI / TRIG_TABLE_SIZE;
+
+	for (int i = 0; i < TRIG_TABLE_SIZE; ++i) {
+		float angle = i * angleStep;
+		cosTable.push_back(cosf(angle));
+		sinTable.push_back(sinf(angle));
+	}
+	
+}
+
+// Show computed values
+void Renderer::showPrecomputedTrigTables() {
+
+	std::cout << "cos values:" << std::endl;
+
+	int count = 0;
+
+	for (const auto value : cosTable) {
+		if (count == 10)
+			break;
+
+		std::cout << value << " | ";
+
+		++count;
+	}
+	
+	count = 0;
+	std::cout << std::endl << "sin values:" << std::endl;
+
+	for (const auto value : sinTable) {
+		if (count == 10)
+			break;
+		
+		std::cout << value << " | ";
+
+		++count;
+	}
+	std::cout << std::endl;
+
 }

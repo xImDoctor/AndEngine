@@ -22,13 +22,19 @@ class Engine {
 
 	MapGenerator generator;		// game map data moved to MapGenerator
 	InputController controller;	// processes player input, key press and changes player coord, angle (processing map movement)
-	Renderer renderer;			// Renderer class object: renderer.render(useDDA = false)
+
+	// Renderer class object: renderer.render(useDDA = false)
+	Renderer renderer;			
 
 	bool isRunning;
 
 public:
 
-	Engine() : playerCoord({ 2.0f, 2.0f }), playerAngle(0.0f), isRunning(true){	}
+	Engine() : playerCoord({ 2.0f, 2.0f }), playerAngle(0.0f), isRunning(true)
+	{
+		// precompute values to optimaze raycasting
+		renderer.precomputeTrigTables();
+	}
 
 	// run game-cycle
 	// with flag to switch between sizeStepped and DDA renders
@@ -40,6 +46,9 @@ public:
 	inline const fcoord_t& getPlayerCoord() const { return playerCoord; }
 	inline float getPlayerAngle() const { return playerAngle; }
 
+	inline static float getRotationSpeed() { return ROTATION_SPEED; }
+	inline static float getMovementSpeed() { return MOVEMENT_SPEED; }
+
 // with map generator now
 	inline int getMapWidth() const { return generator.getMapWidth(); }
 	inline int getMapHeight() const { return generator.getMapHeight(); }
@@ -49,6 +58,10 @@ public:
 // maybe unsafe but get generator to use its methods directly
 	inline MapGenerator& useMapGenerator() {
 		return generator;
+	}
+
+	inline void showPrecomputedTrigVals() {
+		renderer.showPrecomputedTrigTables();
 	}
 
 

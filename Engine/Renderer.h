@@ -31,6 +31,11 @@ class Renderer {
 
 	static constexpr float FOV = MathUtils::Consts::QUART_PI;	// field of view, pi/4
 	static constexpr float depth = 16.0f;						// max render distance
+
+	// cache cos/sin instead of each step calculating
+	std::vector<float> sinTable, cosTable;
+	float angleStep;
+	static constexpr int TRIG_TABLE_SIZE = 3600;  // 0.1 precision points
 	
 	// use string as simple console buffer
 	std::vector<std::string> screenBuffer;
@@ -89,4 +94,39 @@ private:
 
 	// Display buffer through console output and also define elements colors
 	void displayScreen();
+
+
+	// fast search of cached cos
+	inline float getCachedCos(float angle) const {
+
+		// normalization
+		MathUtils::Angles::normalizeAngle(angle);
+
+		// find index in the table
+		int index = static_cast<int>(angle / angleStep);
+		if (index >= cosTable.size()) 
+			index = 0;
+
+		return cosTable[index];
+	}
+
+	// sin analog
+	inline float getCachedSin(float angle) const {
+
+		MathUtils::Angles::normalizeAngle(angle);
+
+		int index = static_cast<int>(angle / angleStep);
+		if (index >= sinTable.size()) index = 0;
+
+		return sinTable[index];
+	}
+
+
+public:
+// pre-compute:
+// 
+	// Computes sin, cos values via compilation, not to compute it every raycasting step
+	void precomputeTrigTables();
+	// Show computed values
+	void showPrecomputedTrigTables();
 };

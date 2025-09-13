@@ -5,13 +5,16 @@
 
 namespace Test {
 	namespace Commands {
-		constexpr const char* START = "start";
 		constexpr const char* START_RAYCAST = "start raycast";
 		constexpr const char* START_DDA = "start dda";
+
 		constexpr const char* INFO = "info";
 		constexpr const char* EXIT = "exit";
+
 		constexpr const char* CHANGE_SEED = "change seed";
 		constexpr const char* SHOW_MAP = "show map";
+
+		constexpr const char* SHOW_TRIG = "show trig";	// show trigonometry (sin, cos) tables
 	}
 
 	enum class InfoType {
@@ -89,6 +92,10 @@ namespace Test {
 			}
 			else if (inputBuf == Commands::START_DDA) {
 				engine.run(true);	// use DDA flag enabled
+			}
+			else if (inputBuf == Commands::SHOW_TRIG) {
+				engine.showPrecomputedTrigVals();
+				showStartAlgInfo(InfoType::Continue);
 			}
 			else if (inputBuf == Commands::CHANGE_SEED) {
 				unsigned int newSeed;
