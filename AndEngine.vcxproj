@@ -145,7 +145,7 @@
     <ClInclude Include="proj_tests.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Notes\RendererOptimizationBeforeRefactoring.md" />
+    <None Include="Notes\RenderOptimization1.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
