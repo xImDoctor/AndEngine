@@ -17,7 +17,7 @@ namespace MathUtils {
 	namespace Angles {
 
 		// normalize angle to [0; 2pi] (used by Engine/Renderer)
-		static void normalizeAngle(float& angle) {
+		constexpr static void normalizeAngle(float& angle) noexcept {
 			while (angle < 0) angle += Consts::TWO_PI;
 			while (angle >= Consts::TWO_PI) angle -= Consts::TWO_PI;
 		}

@@ -8,26 +8,30 @@
 struct coord_t {
 	int x, y;
 
-	// overload for == operator to use coord_t directly in the conditions
-	friend bool operator==(const coord_t& coords1, const coord_t& coords2) {
-		return coords1.x == coords2.x && coords1.y == coords2.y;
+	// better overloads I guess
+	constexpr bool operator==(const coord_t& other) const noexcept {
+		return x == other.x && y == other.y;
 	}
 
-	friend bool operator!=(const coord_t& coords1, const coord_t& coords2) {
-		return !(coords1 == coords2);
+	constexpr bool operator!=(const coord_t& other) const noexcept {
+		return !(*this == other);
 	}
+
+	// overload for == operator to use coord_t directly in the conditions
+	//friend bool operator==(const coord_t& coords1, const coord_t& coords2) { return coords1.x == coords2.x && coords1.y == coords2.y; }
+	//friend bool operator!=(const coord_t& coords1, const coord_t& coords2) { return !(coords1 == coords2); }
 };
 
 
 struct fcoord_t {
 	float x, y;
 
-	friend bool operator==(const fcoord_t& coords1, const fcoord_t& coords2) {
-		return coords1.x == coords2.x && coords1.y == coords2.y;
+	constexpr bool operator==(const fcoord_t& other) const noexcept {
+		return x == other.x && y == other.y;
 	}
 
-	friend bool operator!=(const fcoord_t& coords1, const fcoord_t& coords2) {
-		return !(coords1 == coords2);
+	constexpr bool operator!=(const fcoord_t& other) const noexcept {
+		return !(*this == other);
 	}
 };
 

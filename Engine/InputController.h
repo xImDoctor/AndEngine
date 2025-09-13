@@ -7,7 +7,7 @@
 #include "utils/math_utils.h"
 
 
-static class InputController {
+class InputController {
 
 public:
 
