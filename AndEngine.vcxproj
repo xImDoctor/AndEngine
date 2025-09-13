@@ -145,6 +145,7 @@
     <ClInclude Include="proj_tests.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Notes\GeneralOptimization1.md" />
     <None Include="Notes\RenderOptimization1.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
