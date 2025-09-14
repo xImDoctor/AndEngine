@@ -4,9 +4,11 @@
 // simple raycast algorithm, returns float distance from player to object
 Renderer::Renderer() {
 
-	screenBuffer.resize(RENDER_HEIGHT);	// vector size, not string one
+
+	screenBuffer.reserve(RENDER_HEIGHT);	// vector size, not string one
 	for (auto& line : screenBuffer)
-		line.resize(RENDER_WIDTH, ' '); // resize and clear strings
+		line.reserve(RENDER_WIDTH);
+		//line.resize(RENDER_WIDTH, ' '); // resize and clear strings
 
 	// setup console handle
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -270,7 +272,7 @@ void Renderer::render(const std::vector<std::vector<char>>& map, const fcoord_t&
 	}
 
 	// another renderable things here
-	renderPlayerInfo(playerCoord, playerAngle);
+	renderPlayerInfo_buffered(playerCoord, playerAngle);
 	renderMiniMap(map, playerCoord);
 
 	// draw final buffer to the screen (render -> screen)
@@ -278,7 +280,7 @@ void Renderer::render(const std::vector<std::vector<char>>& map, const fcoord_t&
 }
 
 
-void Renderer::renderPlayerInfo(const fcoord_t& playerCoord, float playerAngle) {
+void Renderer::renderPlayerInfo_buffered(const fcoord_t& playerCoord, float playerAngle) {
 
 	char infoBuf[64];
 	sprintf_s(infoBuf, "X:%.2f Y:%0.2f Angle:%0.2f", playerCoord.x, playerCoord.y, playerAngle);	// setup buffer

@@ -57,7 +57,7 @@ public:
 	void render(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float playerAngle, bool useDDA = false);	
 
 	// info rendering
-	void renderPlayerInfo(const fcoord_t& playerCoord, float playerAngle);
+	void renderPlayerInfo_buffered(const fcoord_t& playerCoord, float playerAngle);
 	void renderMiniMap(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord);
 
 // render delay getter
