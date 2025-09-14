@@ -39,8 +39,8 @@ namespace Test {
 			std::cout << "Type one of the following commands:" << std::endl;
 
 			std::cout << std::endl << "Start rendering:" << std::endl;
-			std::cout << "start raycast - starts console rendering with step-based raycast" << std::endl;
-			std::cout << "start dda - starts console rendering with DDA Raycasting algorithm" << std::endl; // faster one
+			std::cout << "start raycast - starts console rendering with step-based raycast (normal)" << std::endl;
+			std::cout << "start dda - starts console rendering with DDA Raycasting algorithm (works faster)" << std::endl; // faster one
 			
 			std::cout << std::endl << "Map generator:" << std::endl;
 			std::cout << "change seed - opens seed settings" << std::endl;

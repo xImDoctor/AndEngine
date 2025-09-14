@@ -27,8 +27,6 @@ class Renderer {
 
 	static constexpr int MINIMAP_SIZE = 16;
 
-	static constexpr int RENDER_DELAY = 50;		// ms, reduced to increase FPS
-
 	static constexpr float FOV = MathUtils::Consts::QUART_PI;	// field of view, pi/4
 	static constexpr float depth = 16.0f;						// max render distance
 
@@ -59,11 +57,6 @@ public:
 	// info rendering
 	void renderPlayerInfo_buffered(const fcoord_t& playerCoord, float playerAngle);
 	void renderMiniMap(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord);
-
-// render delay getter
-	inline int getRenderDelay() const{
-		return RENDER_DELAY;
-	}
 
 private:
 

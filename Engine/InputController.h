@@ -59,7 +59,7 @@ public:
 
 	// rotate to A-D
 	// move forward-backward to W-S
-	void processInput(const std::vector<std::vector<char>>& map, char pathSymb, fcoord_t& playerCoord, float& playerAngle, float moveSpeed, float rotationSpeed) {
+	void processInput(const std::vector<std::vector<char>>& map, char pathSymb, fcoord_t& playerCoord, float& playerAngle, float moveSpeed, float rotationSpeed, float deltaTime) {
 
 #if _DEBUG
 		printf("Player: (%.1f,%.1f), Map: %dx%d\n",
@@ -78,11 +78,11 @@ public:
 
 		bool rotated = false;
 		if (isKeyDown('A')) {
-			playerAngle -= rotationSpeed;
+			playerAngle -= rotationSpeed * deltaTime;
 			rotated = true;
 		}
 		else if (isKeyDown('D')) {
-			playerAngle += rotationSpeed;
+			playerAngle += rotationSpeed * deltaTime;
 			rotated = true;
 		}
 
@@ -95,15 +95,15 @@ public:
 		fcoord_t newPlayerCoord = playerCoord;
 		if (isKeyDown('W')) {
 
-			newPlayerCoord.x = playerCoord.x + cosf(playerAngle) * moveSpeed;
-			newPlayerCoord.y = playerCoord.y + sinf(playerAngle) * moveSpeed;
+			newPlayerCoord.x = playerCoord.x + cosf(playerAngle) * moveSpeed * deltaTime;
+			newPlayerCoord.y = playerCoord.y + sinf(playerAngle) * moveSpeed * deltaTime;
 			
 			moved = true;
 		}
 		else if (isKeyDown('S')) {
 
-			newPlayerCoord.x = playerCoord.x - cosf(playerAngle) * moveSpeed;
-			newPlayerCoord.y = playerCoord.y - sinf(playerAngle) * moveSpeed;
+			newPlayerCoord.x = playerCoord.x - cosf(playerAngle) * moveSpeed * deltaTime;
+			newPlayerCoord.y = playerCoord.y - sinf(playerAngle) * moveSpeed * deltaTime;
 
 			moved = true;
 		}

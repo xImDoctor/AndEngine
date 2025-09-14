@@ -6,9 +6,12 @@
 #include <cstdlib>
 #include <ctime>
 
+#include <chrono>
+
 #include "InputController.h"
 #include "MapGenerator.h"
 #include "Renderer.h"
+
 
 class Engine {
 
@@ -17,8 +20,13 @@ class Engine {
 	fcoord_t playerCoord; // x, y
 	float playerAngle;
 
-	static constexpr float MOVEMENT_SPEED = 0.25f;
-	static constexpr float ROTATION_SPEED = 0.25f;
+	// before frameTime implemention
+	//static constexpr float MOVEMENT_SPEED = 0.25f;
+	//static constexpr float ROTATION_SPEED = 0.25f;
+
+	// after frameTime
+	static constexpr float MOVEMENT_SPEED = 5.0f;
+	static constexpr float ROTATION_SPEED = 5.0f;
 
 	MapGenerator generator;		// game map data moved to MapGenerator
 	InputController controller;	// processes player input, key press and changes player coord, angle (processing map movement)
@@ -28,9 +36,14 @@ class Engine {
 
 	bool isRunning;
 
+	float deltaTime; // time between frames in sec, to smooth Engine system calling
+	static constexpr float MAX_DELTA_TIME = 1.0f / 30.0f;		// lock max fps with 30
+	static constexpr float TARGET_FPS = 60.0f;
+	static constexpr float FRAME_TIME = 1.0f / TARGET_FPS;
+
 public:
 
-	Engine() : playerCoord({ 2.0f, 2.0f }), playerAngle(0.0f), isRunning(true)
+	Engine() : playerCoord({ 2.0f, 2.0f }), playerAngle(0.0f), isRunning(true), deltaTime(0.0f)
 	{
 		// precompute values to optimaze raycasting
 		renderer.precomputeTrigTables();
