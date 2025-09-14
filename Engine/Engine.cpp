@@ -9,6 +9,7 @@ void Engine::run(bool use_DDA_render) {
 	isRunning = true;
 	while (isRunning) {
 
+		controller.update();
 		controller.processInput(generator.getMap(), Render::Objects::PATH, 
 			playerCoord, playerAngle, MOVEMENT_SPEED, ROTATION_SPEED);
 
