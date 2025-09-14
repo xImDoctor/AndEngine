@@ -5,10 +5,9 @@
 Renderer::Renderer() {
 
 
-	screenBuffer.reserve(RENDER_HEIGHT);	// vector size, not string one
+	screenBuffer.resize(RENDER_HEIGHT);	// vector size, not string one
 	for (auto& line : screenBuffer)
-		line.reserve(RENDER_WIDTH);
-		//line.resize(RENDER_WIDTH, ' '); // resize and clear strings
+		line.resize(RENDER_WIDTH, ' '); // resize and clear strings
 
 	// setup console handle
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
