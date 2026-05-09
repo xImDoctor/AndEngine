@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "Renderer.h"
+#include "ConsoleRenderer.h"
 #include "utils/spawn_utils.h"
 
 class MapGenerator {
