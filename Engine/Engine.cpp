@@ -2,9 +2,17 @@
 
 
 // Game cycle running
-void Engine::run(bool use_DDA_render) {
+void Engine::run(bool useOpenGLRenderer, bool use_DDA_render) {
 
 	system("cls");			// clear window before game drawing
+
+	
+	// init choosen renderer (gl, console)
+	if (useOpenGLRenderer)
+		renderer = std::make_unique<GLRenderer>();
+	else 
+		renderer = std::make_unique<ConsoleRenderer>();
+
 
 	auto lastTime = std::chrono::high_resolution_clock::now();
 	

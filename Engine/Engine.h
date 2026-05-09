@@ -10,7 +10,10 @@
 
 #include "InputController.h"
 #include "MapGenerator.h"
-#include "Renderer.h"
+
+// Renderers
+#include "gl/GLRenderer.h"
+#include "ConsoleRenderer.h"
 
 
 class Engine {
@@ -31,8 +34,8 @@ class Engine {
 	MapGenerator generator;		// game map data moved to MapGenerator
 	InputController controller;	// processes player input, key press and changes player coord, angle (processing map movement)
 
-	// Renderer class object: renderer.render(useDDA = false)
-	Renderer renderer;			
+	// Now 2 renderers: console, gl
+	std::unique_ptr<IRenderer> renderer;
 
 	bool isRunning;
 
@@ -45,13 +48,12 @@ public:
 
 	Engine() : playerCoord({ 2.0f, 2.0f }), playerAngle(0.0f), isRunning(true), deltaTime(0.0f)
 	{
-		// precompute values to optimaze raycasting
-		renderer.precomputeTrigTables();
+		// trig tables precompute (optimization) now in RaycastEngine
 	}
 
 	// run game-cycle
 	// with flag to switch between sizeStepped and DDA renders
-	void run(bool use_DDA_render = false);
+	void run(bool useOpenGLRenderer = false, bool use_DDA_render = false);
 
 
 // getters for Renderer:
