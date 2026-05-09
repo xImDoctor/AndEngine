@@ -11,7 +11,7 @@ class IRenderer {
 
 public:
 	virtual void render(const std::vector<std::vector<char>>& map,
-		const fcoord_t& playerCoord, float playerAngle, bool useDDA);
+		const fcoord_t& playerCoord, float playerAngle, bool useDDA) = 0;
 
 	virtual ~IRenderer() = default;
 };
