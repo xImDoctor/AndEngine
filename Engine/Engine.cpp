@@ -9,7 +9,7 @@ void Engine::run(bool useOpenGLRenderer, bool use_DDA_render) {
 	
 	// init choosen renderer (gl, console)
 	if (useOpenGLRenderer)
-		renderer = std::make_unique<GLRenderer>();
+		renderer = std::make_unique<GLRenderer>(glWindow);
 	else 
 		renderer = std::make_unique<ConsoleRenderer>();
 

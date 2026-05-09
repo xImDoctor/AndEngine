@@ -15,6 +15,8 @@
 #include "gl/GLRenderer.h"
 #include "ConsoleRenderer.h"
 
+#include "gl/OpenGLWindow.h"
+
 
 class Engine {
 
@@ -36,6 +38,9 @@ class Engine {
 
 	// Now 2 renderers: console, gl
 	std::unique_ptr<IRenderer> renderer;
+
+	// gl window to be created by Engine
+	OpenGLWindow glWindow;
 
 	bool isRunning;
 
