@@ -36,7 +36,7 @@ void Engine::run(bool useOpenGLRenderer, bool use_DDA_render) {
 			isRunning = false;
 
 		// scene rendering with choosen mode
-		renderer.render(generator.getMap(), playerCoord, playerAngle, use_DDA_render);
+		renderer->render(generator.getMap(), playerCoord, playerAngle, use_DDA_render);
 
 		auto frameEndTime = std::chrono::high_resolution_clock::now();
 		auto frameTime = std::chrono::duration<float>(frameEndTime - currentTime).count();
