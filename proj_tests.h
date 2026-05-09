@@ -8,13 +8,16 @@ namespace Test {
 		constexpr const char* START_RAYCAST = "start raycast";
 		constexpr const char* START_DDA = "start dda";
 
+		constexpr const char* SET_CONSOLE_MODE = "use console";
+		constexpr const char* SET_GL_MODE = "use gl";
+
 		constexpr const char* INFO = "info";
 		constexpr const char* EXIT = "exit";
 
 		constexpr const char* CHANGE_SEED = "change seed";
 		constexpr const char* SHOW_MAP = "show map";
 
-		constexpr const char* SHOW_TRIG = "show trig";	// show trigonometry (sin, cos) tables
+		//constexpr const char* SHOW_TRIG = "show trig";	// show trigonometry (sin, cos) tables
 	}
 
 	enum class InfoType {
@@ -36,12 +39,21 @@ namespace Test {
 		if (type == InfoType::General) {
 
 			std::cout << "AndEngine renderer test." << std::endl;
+
+			//  just rederer update block
+			std::cout << "Renderer update: now implemented two render modes: console (old) and OpenGL graphics (new)." << std::endl;
+			std::cout << "Program uses old console one as default but you can change it with command below" << std::endl;
+
 			std::cout << "Type one of the following commands:" << std::endl;
 
-			std::cout << std::endl << "Start rendering:" << std::endl;
-			std::cout << "start raycast - starts console rendering with step-based raycast (normal)" << std::endl;
-			std::cout << "start dda - starts console rendering with DDA Raycasting algorithm (works faster)" << std::endl; // faster one
-			
+			std::cout << std::endl << "Start rendering (console by default):" << std::endl;
+			std::cout << "start raycast - starts rendering with step-based raycast (normal)" << std::endl;
+			std::cout << "start dda - starts rendering with DDA Raycasting algorithm (works faster)" << std::endl;
+
+			std::cout << std::endl << "Change renderer mode:" << std::endl;
+			std::cout << "use console - sets console renderer (default)" << std::endl;
+			std::cout << "use gl - sets window renderer made with OpenGL graphics, not console" << std::endl;
+
 			std::cout << std::endl << "Map generator:" << std::endl;
 			std::cout << "change seed - opens seed settings" << std::endl;
 			std::cout << "show map - displays pre-generated game map" << std::endl;
@@ -70,6 +82,8 @@ namespace Test {
 		const std::size_t MAX_START_INPUT_SIZE = 14;
 		std::string inputBuf;
 
+		bool useGLRenderer = false;
+
 		while (1) {
 
 			system("cls");
@@ -87,16 +101,26 @@ namespace Test {
 			if (inputBuf.size() > MAX_START_INPUT_SIZE)
 				inputBuf.resize(MAX_START_INPUT_SIZE);
 
+			// run engine block
 			if (inputBuf == Commands::START_RAYCAST) {
-				engine.run();
+				engine.run(useGLRenderer);
 			}
 			else if (inputBuf == Commands::START_DDA) {
-				engine.run(true);	// use DDA flag enabled
+				engine.run(useGLRenderer, true);	// second param: use DDA flag enabled
 			}
+			// set renderer (console, gl), just turns on/off gl renderer use
+			else if (inputBuf == Commands::SET_CONSOLE_MODE) {
+				useGLRenderer = false;
+			}
+			else if (inputBuf == Commands::SET_GL_MODE) {
+				useGLRenderer = true;
+			}
+			/* commented because precompute method moved to RaycastEngine (not accessable now)
 			else if (inputBuf == Commands::SHOW_TRIG) {
-				// engine.showPrecomputedTrigVals();
+				 engine.showPrecomputedTrigVals();
 				showStartAlgInfo(InfoType::Continue);
-			}
+			}*/
+			// other stuff (seed, map, info, exit)
 			else if (inputBuf == Commands::CHANGE_SEED) {
 				unsigned int newSeed;
 
