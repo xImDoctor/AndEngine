@@ -75,9 +75,9 @@ public:
 		return generator;
 	}
 
-	inline void showPrecomputedTrigVals() {
-		renderer.showPrecomputedTrigTables();
-	}
+	//inline void showPrecomputedTrigVals() {
+	//	renderer.showPrecomputedTrigTables();
+	//}
 
 
 private:

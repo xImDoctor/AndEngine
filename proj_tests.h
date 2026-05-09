@@ -94,7 +94,7 @@ namespace Test {
 				engine.run(true);	// use DDA flag enabled
 			}
 			else if (inputBuf == Commands::SHOW_TRIG) {
-				engine.showPrecomputedTrigVals();
+				// engine.showPrecomputedTrigVals();
 				showStartAlgInfo(InfoType::Continue);
 			}
 			else if (inputBuf == Commands::CHANGE_SEED) {
