@@ -39,6 +39,9 @@
     <ClCompile Include="Engine\utils\common_utils.cpp">
       <Filter>Исходные файлы\utils</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\gl\OpenGLWindow.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Renderer.h">
@@ -68,10 +71,12 @@
     <ClInclude Include="Engine\InputController.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\gl\OpenGLWindow.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Notes\RendererOptimizationBeforeRefactoring.md">
-      <Filter>Файлы ресурсов\Notes</Filter>
-    </None>
+    <None Include="Notes\GeneralOptimization1.md" />
+    <None Include="Notes\RenderOptimization1.md" />
   </ItemGroup>
 </Project>

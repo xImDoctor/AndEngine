@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Engine.cpp" />
+    <ClCompile Include="Engine\gl\OpenGLWindow.cpp" />
     <ClCompile Include="Engine\Renderer.cpp" />
     <ClCompile Include="Engine\utils\common_utils.cpp" />
     <ClCompile Include="Engine\utils\render_utils.cpp" />
@@ -135,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h" />
+    <ClInclude Include="Engine\gl\OpenGLWindow.h" />
     <ClInclude Include="Engine\InputController.h" />
     <ClInclude Include="Engine\MapGenerator.h" />
     <ClInclude Include="Engine\Renderer.h" />
