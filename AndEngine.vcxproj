@@ -128,22 +128,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Engine.cpp" />
+    <ClCompile Include="Engine\gl\GLRenderer.cpp" />
     <ClCompile Include="Engine\gl\OpenGLWindow.cpp" />
-    <ClCompile Include="Engine\Renderer.cpp" />
+    <ClCompile Include="Engine\ConsoleRenderer.cpp" />
+    <ClCompile Include="Engine\RaycastEngine\RaycastEngine.cpp" />
     <ClCompile Include="Engine\utils\common_utils.cpp" />
     <ClCompile Include="Engine\utils\render_utils.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Engine.h" />
+    <ClInclude Include="Engine\gl\GLRenderer.h" />
     <ClInclude Include="Engine\gl\OpenGLWindow.h" />
     <ClInclude Include="Engine\InputController.h" />
     <ClInclude Include="Engine\MapGenerator.h" />
-    <ClInclude Include="Engine\Renderer.h" />
+    <ClInclude Include="Engine\ConsoleRenderer.h" />
+    <ClInclude Include="Engine\RaycastEngine\RaycastEngine.h" />
     <ClInclude Include="Engine\utils\common_utils.h" />
     <ClInclude Include="Engine\utils\render_utils.h" />
     <ClInclude Include="Engine\utils\spawn_utils.h" />
     <ClInclude Include="Engine\utils\math_utils.h" />
+    <ClInclude Include="Engine\IRenderer.h" />
     <ClInclude Include="proj_tests.h" />
   </ItemGroup>
   <ItemGroup>
