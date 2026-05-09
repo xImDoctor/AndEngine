@@ -28,7 +28,7 @@ float RaycastEngine::castRay_stepped(const std::vector<std::vector<char>>& map, 
 
 	bool isWallHit = false;
 
-	while (!isWallHit && distance < depth) {
+	while (!isWallHit && distance < DEPTH) {
 		distance += stepSize;
 
 		// ray new position
@@ -60,7 +60,7 @@ float RaycastEngine::castRay_dda(const std::vector<std::vector<char>>& map, cons
 	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
 
 	if (!mapHeight || !mapWidth)
-		return depth;
+		return DEPTH;
 
 
 	// use cached values instead
@@ -75,7 +75,7 @@ float RaycastEngine::castRay_dda(const std::vector<std::vector<char>>& map, cons
 
 	// border check as at the stepped alg
 	if (mapCoord.x < 0 || mapCoord.x >= mapWidth || mapCoord.y < 0 || mapCoord.y >= mapHeight)
-		return depth;
+		return DEPTH;
 
 	// we have directly hit a wall
 	if (map[mapCoord.y][mapCoord.x] == Render::Objects::WALL)
@@ -128,7 +128,7 @@ float RaycastEngine::castRay_dda(const std::vector<std::vector<char>>& map, cons
 
 		// check bounds again
 		if (mapCoord.x < 0 || mapCoord.x >= mapWidth || mapCoord.y < 0 || mapCoord.y >= mapHeight)
-			return depth;
+			return DEPTH;
 
 		// if coords crosses with wall - we hit it
 		if (map[mapCoord.y][mapCoord.x] == Render::Objects::WALL)
@@ -145,8 +145,8 @@ float RaycastEngine::castRay_dda(const std::vector<std::vector<char>>& map, cons
 		perpDistance = (mapCoord.x - playerCoord.x + (1 - stepCoord.x) / 2.0f) / rayDirection.x;
 
 	// if distance bigger then max distance, return max one
-	if (perpDistance > depth)
-		return depth;
+	if (perpDistance > DEPTH)
+		return DEPTH;
 
 	return perpDistance;
 }
