@@ -38,7 +38,7 @@ float RaycastEngine::castRay_stepped(const std::vector<std::vector<char>>& map, 
 		// check map border
 		if (rayCoord.x < 0 || rayCoord.x >= mapWidth || rayCoord.y < 0 || rayCoord.y >= mapHeight) {
 			isWallHit = true;
-			distance = depth;
+			distance = DEPTH;
 		}
 		else {
 			// check if wall is hit
