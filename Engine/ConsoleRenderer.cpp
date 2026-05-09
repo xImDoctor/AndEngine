@@ -1,9 +1,8 @@
-#include "Renderer.h"
+#include "ConsoleRenderer.h"
 
 
 // simple raycast algorithm, returns float distance from player to object
-Renderer::Renderer() {
-
+ConsoleRenderer::ConsoleRenderer() {
 
 	screenBuffer.resize(RENDER_HEIGHT);	// vector size, not string one
 	for (auto& line : screenBuffer)
@@ -21,156 +20,11 @@ Renderer::Renderer() {
 }
 
 
-// Get drawing symbol for wall based on its distance
-float Renderer::castRay_stepped(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float rayAngle) {
-
-	int mapHeight = static_cast<int>(map.size());
-	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
-
-	// angle normalization
-	//normalizeAngle(rayAngle);	// inside of precomputed search now
-
-	fcoord_t rayCoord = playerCoord;	// cast rays from player pos
-
-	fcoord_t rayDirection;
-
-	// use precomputed values
-	//rayDirection.x = cosf(rayAngle);
-	//rayDirection.y = sinf(rayAngle);
-	rayDirection = { getCachedCos(rayAngle), getCachedSin(rayAngle) };
-
-	float distance = 0.0f;
-	float stepSize = 0.01f;  // ray step size
-
-	bool isWallHit = false;
-
-	while (!isWallHit && distance < depth) {
-		distance += stepSize;
-
-		// ray new position
-		rayCoord.x = playerCoord.x + rayDirection.x * distance;
-		rayCoord.y = playerCoord.y + rayDirection.y * distance;
-
-		// check map border
-		if (rayCoord.x < 0 || rayCoord.x >= mapWidth || rayCoord.y < 0 || rayCoord.y >= mapHeight) {
-			isWallHit = true;
-			distance = depth;
-		}
-		else {
-			// check if wall is hit
-			coord_t mapCoord = { static_cast<int>(rayCoord.x), static_cast<int>(rayCoord.y) };
-			if (map[mapCoord.y][mapCoord.x] == Render::Objects::WALL)
-				isWallHit = true;
-		}
-
-	}
-
-	return distance;
-}
-
-
-// DDA version of raycast
-float Renderer::castRay_dda(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float rayAngle) {
-
-	int mapHeight = static_cast<int>(map.size());
-	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
-
-	if (!mapHeight || !mapWidth)
-		return depth;
-
-
-	// use cached values instead
-	//normalizeAngle(rayAngle);
-	//fcoord_t rayDirection = { cosf(rayAngle), sinf(rayAngle) };
-
-	fcoord_t rayDirection = { getCachedCos(rayAngle), getCachedSin(rayAngle)};
-	fcoord_t rayCoord = playerCoord;
-
-	// which box of the map (grid) we are in; int coord struct
-	coord_t mapCoord = { static_cast<int>(rayCoord.x), static_cast<int>(rayCoord.y) };
-
-	// border check as at the stepped alg
-	if (mapCoord.x < 0 || mapCoord.x >= mapWidth || mapCoord.y < 0 || mapCoord.y >= mapHeight)
-		return depth;
-
-	// we have directly hit a wall
-	if (map[mapCoord.y][mapCoord.x] == Render::Objects::WALL)
-		return 0.0f;
-
-	// init max  (limited) float value for alg
-	constexpr float FLOAT_INFINITY = std::numeric_limits<float>::infinity();
-
-	// delta distances of alg
-	fcoord_t deltaDistance;
-	deltaDistance.x = (rayDirection.x == 0.0f) ? FLOAT_INFINITY : std::fabsf(1.0f / rayDirection.x);
-	deltaDistance.y = (rayDirection.y == 0.0f) ? FLOAT_INFINITY : std::fabsf(1.0f / rayDirection.y);
-
-	coord_t stepCoord;			// int coords of each step for grid cells
-	fcoord_t sideDistance;	// side distance coord
-
-	if (rayDirection.x < 0.0f) {
-		stepCoord.x = -1;
-		sideDistance.x = rayCoord.x - mapCoord.x * deltaDistance.x;
-	}
-	else {
-		stepCoord.x = 1;
-		sideDistance.x = mapCoord.x + 1 - rayCoord.x * deltaDistance.x;
-	}
-
-	if (rayDirection.y < 0.0f) {
-		stepCoord.y = -1;
-		sideDistance.y = rayCoord.y - mapCoord.y * deltaDistance.y;
-	}
-	else {
-		stepCoord.y = 1;
-		sideDistance.y = mapCoord.y + 1 - rayCoord.y * deltaDistance.y;
-	}
-
-	bool isWallHit = false;
-	int side = 0;	// if 0 then hit vertical side (x), if 1 then hit horizontal side (y)
-
-	while (!isWallHit) {
-
-		if (sideDistance.x < sideDistance.y) {	// vertical side
-			sideDistance.x += deltaDistance.x;
-			mapCoord.x += stepCoord.x;
-			side = 0;
-		}
-		else {									// else horiz one
-			sideDistance.y += deltaDistance.y;
-			mapCoord.y += stepCoord.y;
-			side = 1;
-		}
-
-		// check bounds again
-		if (mapCoord.x < 0 || mapCoord.x >= mapWidth || mapCoord.y < 0 || mapCoord.y >= mapHeight)
-			return depth;
-
-		// if coords crosses with wall - we hit it
-		if (map[mapCoord.y][mapCoord.x] == Render::Objects::WALL)
-			isWallHit = true;
-
-	}
-
-	// calc perpendicular distance (projected on camera direction)
-	float perpDistance;
-
-	if (side)	// 1, horiz line
-		perpDistance = (mapCoord.y - playerCoord.y + (1 - stepCoord.y) / 2.0f) / rayDirection.y;
-	else		// vertical line
-		perpDistance = (mapCoord.x - playerCoord.x + (1 - stepCoord.x) / 2.0f) / rayDirection.x;
-
-	// if distance bigger then max distance, return max one
-	if (perpDistance > depth)
-		return depth;
-
-	return perpDistance;
-}
-
-
 // Chooses symbol color depending on its shape and sets color to it
 // predefine with 1 not to use when not written in other code
-char Renderer::getObjectSymb(float distance) {
+char ConsoleRenderer::getObjectSymb(float distance) {
+
+	static const float depth = RaycastEngine::DEPTH;
 
 	static const char symbs[] = { ' ', '#', 'X', 'O', 'x', '-', '.' };				// nothing as 0
 	static constexpr int symbArrSize = static_cast<int>((sizeof(symbs) / (sizeof(symbs[0]))));	// to know it when compiled
@@ -192,7 +46,7 @@ char Renderer::getObjectSymb(float distance) {
 }
 
 
-void Renderer::setObjectColor(const char symb, const int heightValue) { // predefine with 1 not to use when not written in other code
+void ConsoleRenderer::setObjectColor(const char symb, const int heightValue) { // predefine with 1 not to use when not written in other code
 
 	switch (symb) {
 		// in-screen walls displaying colors
@@ -233,7 +87,7 @@ void Renderer::setObjectColor(const char symb, const int heightValue) { // prede
 
 // Main rendering function with all renderable elements implemented
 // bool useDDA enables/disables castRay_DDA
-void Renderer::render(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float playerAngle, bool useDDA) {
+void ConsoleRenderer::render(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord, float playerAngle, bool useDDA) {
 
 	// removed cls
 	// system("cls");
@@ -241,10 +95,10 @@ void Renderer::render(const std::vector<std::vector<char>>& map, const fcoord_t&
 	// render every col on the screen to make walls
 	for (int x = 0; x < RENDER_WIDTH; ++x) {
 
-		float rayAngle = (playerAngle - FOV / 2.0f) + ((float)x / (float)RENDER_WIDTH) * FOV;
+		float rayAngle = (playerAngle - RaycastEngine::FOV / 2.0f) + ((float)x / (float)RENDER_WIDTH) * RaycastEngine::FOV;
 
 		// casting ray to return wall distance, with algorithm choosing now
-		float distance = useDDA ? castRay_dda(map, playerCoord, rayAngle) : castRay_stepped(map, playerCoord, rayAngle);
+		float distance = useDDA ? raycast.castRay_dda(map, playerCoord, rayAngle) : raycast.castRay_stepped(map, playerCoord, rayAngle);
 
 		// fix fish eye effect
 		distance *= cosf(rayAngle - playerAngle);
@@ -279,7 +133,7 @@ void Renderer::render(const std::vector<std::vector<char>>& map, const fcoord_t&
 }
 
 
-void Renderer::renderPlayerInfo_buffered(const fcoord_t& playerCoord, float playerAngle) {
+void ConsoleRenderer::renderPlayerInfo_buffered(const fcoord_t& playerCoord, float playerAngle) {
 
 	char infoBuf[64];
 	sprintf_s(infoBuf, "X:%.2f Y:%0.2f Angle:%0.2f", playerCoord.x, playerCoord.y, playerAngle);	// setup buffer
@@ -292,7 +146,7 @@ void Renderer::renderPlayerInfo_buffered(const fcoord_t& playerCoord, float play
 }
 
 
-void Renderer::renderMiniMap(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord) {
+void ConsoleRenderer::renderMiniMap(const std::vector<std::vector<char>>& map, const fcoord_t& playerCoord) {
 	
 	int mapHeight = static_cast<int>(map.size());
 	int mapWidth = mapHeight > 0 ? static_cast<int>(map[0].size()) : 0;
@@ -345,12 +199,12 @@ void Renderer::renderMiniMap(const std::vector<std::vector<char>>& map, const fc
 
 
 // normalize angle to [0; 2pi]
-void Renderer::normalizeAngle(float& angle) {
+void ConsoleRenderer::normalizeAngle(float& angle) {
 	MathUtils::Angles::normalizeAngle(angle);
 }
 
 // Clears screenBuffer
-void Renderer::clearScreenBuffer() {
+void ConsoleRenderer::clearScreenBuffer() {
 
 	for (auto& line : screenBuffer)
 		std::fill(line.begin(), line.end(), ' ');
@@ -358,7 +212,7 @@ void Renderer::clearScreenBuffer() {
 
 
 // display buffer through console output and also define elements colors
-void Renderer::displayScreen() {
+void ConsoleRenderer::displayScreen() {
 
 	//clearScreenBuffer();
 
@@ -378,54 +232,4 @@ void Renderer::displayScreen() {
 
 	Render::Utils::setDefaultColor();
 	std::cout.flush(); // removed cls so flush out buffer directly
-}
-
-
-// Computes sin, cos values via compilation, not to compute it every raycasting step
-void Renderer::precomputeTrigTables() {
-
-	cosTable.clear();
-	sinTable.clear();
-	cosTable.reserve(TRIG_TABLE_SIZE);
-	sinTable.reserve(TRIG_TABLE_SIZE);
-
-	angleStep = MathUtils::Consts::TWO_PI / TRIG_TABLE_SIZE;
-
-	for (int i = 0; i < TRIG_TABLE_SIZE; ++i) {
-		float angle = i * angleStep;
-		cosTable.push_back(cosf(angle));
-		sinTable.push_back(sinf(angle));
-	}
-	
-}
-
-// Show computed values
-void Renderer::showPrecomputedTrigTables() {
-
-	std::cout << "cos values:" << std::endl;
-
-	int count = 0;
-
-	for (const auto value : cosTable) {
-		if (count == 10)
-			break;
-
-		std::cout << value << " | ";
-
-		++count;
-	}
-	
-	count = 0;
-	std::cout << std::endl << "sin values:" << std::endl;
-
-	for (const auto value : sinTable) {
-		if (count == 10)
-			break;
-		
-		std::cout << value << " | ";
-
-		++count;
-	}
-	std::cout << std::endl;
-
 }
