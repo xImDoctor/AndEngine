@@ -11,7 +11,7 @@ This is a lightweight `2.5D` (*pseudo-3D*) game engine inspired by really old (c
 Current stage:
 - Console Renderer:
 ![Console Renderer Preview](demo-img/MapRenderer.gif)
-- GL Renderer:
+- GL Renderer *(step-based raycasting so there are some artefacts at the wall drawing, `use dda` to resolve)*:
 ![Graphics Renderer Preview](demo-img/GLRenderer.gif)
 
 
@@ -61,8 +61,9 @@ After starting of `AndEngine.exe`, type one of the CLI commands to proceed:
 
 | Command | Description |
 |---|---|
-| `start raycast` | Console renderer, step-based raycast |
-| `start dda` | Console renderer, DDA algorithm (faster) |
+| `start` | Launch rendering with selected renderer and raycast algorithm |
+| `use sba` | Switch to step-based raycast algorithm (default) |
+| `use dda` | Switch to DDA raycasting *(faster, less artefacts)* |
 | `use console` | Switch to console renderer (default) |
 | `use gl` | Switch to OpenGL renderer |
 | `change seed` | Change map generation seed |
