@@ -38,17 +38,22 @@ namespace Test {
 
 		if (type == InfoType::General) {
 
-			std::cout << "AndEngine renderer test." << std::endl;
+			Render::Utils::SetTextColor(Render::Objects::Colors::BrightRed);
+			std::cout << "AndEngine renderer test" << std::endl << std::endl;
+			Render::Utils::setDefaultColor();
 
 			//  just rederer update block
-			std::cout << "Renderer update: now implemented two render modes: console (old) and OpenGL graphics (new)." << std::endl;
-			std::cout << "Program uses old console one as default but you can change it with command below" << std::endl;
+			Render::Utils::SetTextColor(Render::Objects::Colors::BrightGreen);
+			std::cout << "[Renderer update! v.0.1.0]";
+			Render::Utils::setDefaultColor();
+			std::cout << " Now there are implemented two renderer modes: console (old) and OpenGL graphics(new)." << std::endl;
+			std::cout << "Program uses old console one as default but you can change it with commands below" << std::endl;
 
-			std::cout << "Type one of the following commands:" << std::endl;
+			std::cout << std::endl << "Type one of the following commands:" << std::endl;
 
 			std::cout << std::endl << "Start rendering (console by default):" << std::endl;
-			std::cout << "start raycast - starts rendering with step-based raycast (normal)" << std::endl;
-			std::cout << "start dda - starts rendering with DDA Raycasting algorithm (works faster)" << std::endl;
+			std::cout << "start raycast - starts rendering with step-based raycast (normal, stable)" << std::endl;
+			std::cout << "start dda - starts rendering with DDA Raycasting algorithm (works faster, but could be artefacts)" << std::endl;
 
 			std::cout << std::endl << "Change renderer mode:" << std::endl;
 			std::cout << "use console - sets console renderer (default)" << std::endl;
@@ -76,7 +81,8 @@ namespace Test {
 	}
 
 
-	// Starts engine rendering with one of the choosen algorithms (step-based, dda)
+	// Starts engine rendering with one of the algorithms (step-based, dda) and one of actual renderers (console, gl)
+	// Changing of the rendering algorithm and the renderer are also here
 	void startAlgTest(Engine& engine) {
 
 		const std::size_t MAX_START_INPUT_SIZE = 14;
@@ -103,10 +109,24 @@ namespace Test {
 
 			// run engine block
 			if (inputBuf == Commands::START_RAYCAST) {
+
+				if (useGLRenderer)
+					engine.createWindow(1280, 720, "AndEngine (GL Renderer)");
+
 				engine.run(useGLRenderer);
+
+				if (useGLRenderer)
+					engine.removeWindow();
 			}
 			else if (inputBuf == Commands::START_DDA) {
+
+				if (useGLRenderer)
+					engine.createWindow(1280, 720, "AndEngine (GL Renderer)");
+
 				engine.run(useGLRenderer, true);	// second param: use DDA flag enabled
+
+				if (useGLRenderer)
+					engine.removeWindow();
 			}
 			// set renderer (console, gl), just turns on/off gl renderer use
 			else if (inputBuf == Commands::SET_CONSOLE_MODE) {
