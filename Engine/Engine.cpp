@@ -9,6 +9,7 @@ bool Engine::createWindow(int width, int height, const std::string& title) {
 }
 
 void Engine::removeWindow() {
+	renderer.reset();	// cleanup rendrer context before window destruction
 	glWindow.cleanup();
 }
 
