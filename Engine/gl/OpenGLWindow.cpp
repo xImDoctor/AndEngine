@@ -13,10 +13,15 @@ bool OpenGLWindow::init() {
 
 	// init glfw
 	if (!glfwInit()) {
+#ifdef _DEBUG
 		std::cerr << "[Error] Failed to init the GLFW\n";
+#endif
 		return false;
 	}
+
+#ifdef _DEBUG
 	std::cout << "[Success] GLFW is initialized\n";
+#endif
 
 	// setup Opengl
 	// opengl core profile
@@ -33,12 +38,15 @@ bool OpenGLWindow::init() {
 	window = glfwCreateWindow(width, height, windowTitle.c_str(), nullptr, nullptr);
 
 	if (!window) {
+#ifdef _DEBUG
 		std::cerr << "[Error] Failed to create a window\n";
+#endif
 		glfwTerminate();
 		return false;
 	}
+#ifdef _DEBUG
 	std::cout << "[Success] Window is created\n";
-
+#endif
 
 	// Make OpenGL context for this window
 	glfwMakeContextCurrent(window);
@@ -46,14 +54,17 @@ bool OpenGLWindow::init() {
 
 	// load OpenGL function pointers via GLAD
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+#ifdef _DEBUG
 		std::cerr << "[Error] Failed to init GLAD\n";
+#endif	
 		glfwTerminate();
 
 		isInitialized = false;
 		return isInitialized;
 	}
+#ifdef _DEBUG
 	std::cout << "[Success] GLAD is initialized\n";
-
+#endif
 
 	// save pointer for callbacks
 	glfwSetWindowUserPointer(window, this);
