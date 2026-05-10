@@ -56,6 +56,14 @@ public:
 		// trig tables precompute (optimization) now in RaycastEngine
 	}
 
+	// makes GLWindow if useGL, before game-cycle running
+	// wrapper above OpenGLWindow class
+	// returns creation status (0 if successful)
+	bool createWindow(int width = 1280, int height = 720, const std::string& title = "AndEngine");
+
+	// removal wrapper, calls window cleanup code
+	void removeWindow();
+
 	// run game-cycle
 	// with flag to switch between sizeStepped and DDA renders
 	void run(bool useOpenGLRenderer = false, bool use_DDA_render = false);
@@ -79,6 +87,9 @@ public:
 	inline MapGenerator& useMapGenerator() {
 		return generator;
 	}
+
+// check if GLWindow created (get status)
+	inline bool getGLWindowStatus() const { return glWindow.getInitStatus(); }
 
 	//inline void showPrecomputedTrigVals() {
 	//	renderer.showPrecomputedTrigTables();
