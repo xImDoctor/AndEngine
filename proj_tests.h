@@ -5,8 +5,10 @@
 
 namespace Test {
 	namespace Commands {
-		constexpr const char* START_RAYCAST = "start raycast";
-		constexpr const char* START_DDA = "start dda";
+		constexpr const char* START_RENDERER = "start";
+
+		constexpr const char* SET_SBA = "use sba";
+		constexpr const char* SET_DDA = "use dda";
 
 		constexpr const char* SET_CONSOLE_MODE = "use console";
 		constexpr const char* SET_GL_MODE = "use gl";
@@ -47,25 +49,28 @@ namespace Test {
 			std::cout << "[Renderer update! v.0.1.0]";
 			Render::Utils::setDefaultColor();
 			std::cout << " Now there are implemented two renderer modes: console (old) and OpenGL graphics(new)." << std::endl;
-			std::cout << "Program uses old console one as default but you can change it with commands below" << std::endl;
+			std::cout << "Program uses console one as default but you can change it with commands below" << std::endl;
 
 			std::cout << std::endl << "Type one of the following commands:" << std::endl;
 
-			std::cout << std::endl << "Start rendering (console by default):" << std::endl;
-			std::cout << "start raycast - starts rendering with step-based raycast (normal, stable)" << std::endl;
-			std::cout << "start dda - starts rendering with DDA Raycasting algorithm (works faster, but could be artefacts)" << std::endl;
+			std::cout << std::endl << "Start rendering:" << std::endl;
+			std::cout << "start\t\t- starts rendering with choosen raycast algorithm and renderer" << std::endl;
 
-			std::cout << std::endl << "Change renderer mode:" << std::endl;
-			std::cout << "use console - sets console renderer (default)" << std::endl;
-			std::cout << "use gl - sets window renderer made with OpenGL graphics, not console" << std::endl;
+			std::cout << std::endl << "Change raycast algorithm (step-based by default):" << std::endl;
+			std::cout << "use sba\t\t- sets step-based algorithm" << std::endl;
+			std::cout << "use dda\t\t- sets DDA (works faster, but could be artefacts)" << std::endl;
+
+			std::cout << std::endl << "Change renderer (console by default):" << std::endl;
+			std::cout << "use console\t- sets console renderer" << std::endl;
+			std::cout << "use gl\t\t- sets window renderer made with OpenGL graphics, not console" << std::endl;
 
 			std::cout << std::endl << "Map generator:" << std::endl;
-			std::cout << "change seed - opens seed settings" << std::endl;
-			std::cout << "show map - displays pre-generated game map" << std::endl;
+			std::cout << "change seed\t- opens seed settings" << std::endl;
+			std::cout << "show map\t- displays pre-generated game map" << std::endl;
 			
 			std::cout << std::endl << "How to use and logout:" << std::endl;
-			std::cout << "info - information about in-scene data and controls" << std::endl;
-			std::cout << "exit - stop this application" << std::endl;
+			std::cout << "info\t\t- information about in-scene data and controls" << std::endl;
+			std::cout << "exit\t\t- stop this application" << std::endl;
 		}
 		else if (type == InfoType::Controls) {
 
@@ -88,7 +93,8 @@ namespace Test {
 		const std::size_t MAX_START_INPUT_SIZE = 14;
 		std::string inputBuf;
 
-		bool useGLRenderer = false;
+		bool useDDA = false;		// step-based, dda
+		bool useGLRenderer = false; // console, gl
 
 		while (1) {
 
@@ -108,25 +114,22 @@ namespace Test {
 				inputBuf.resize(MAX_START_INPUT_SIZE);
 
 			// run engine block
-			if (inputBuf == Commands::START_RAYCAST) {
+			if (inputBuf == Commands::START_RENDERER) {
 
 				if (useGLRenderer)
 					engine.createWindow(1280, 720, "AndEngine (GL Renderer)");
 
-				engine.run(useGLRenderer);
+				engine.run(useGLRenderer, useDDA); // second param: use DDA flag 
 
 				if (useGLRenderer)
 					engine.removeWindow();
 			}
-			else if (inputBuf == Commands::START_DDA) {
-
-				if (useGLRenderer)
-					engine.createWindow(1280, 720, "AndEngine (GL Renderer)");
-
-				engine.run(useGLRenderer, true);	// second param: use DDA flag enabled
-
-				if (useGLRenderer)
-					engine.removeWindow();
+			// set raycast algorithm (step-based, dda)
+			else if (inputBuf == Commands::SET_SBA) {
+				useDDA = false;
+			}
+			else if (inputBuf == Commands::SET_DDA) {
+				useDDA = true;
 			}
 			// set renderer (console, gl), just turns on/off gl renderer use
 			else if (inputBuf == Commands::SET_CONSOLE_MODE) {
