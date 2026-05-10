@@ -1,23 +1,49 @@
 #include "Engine.h"
 
 
+// Method makes GLWindow (wrapper above OpenGLWindow class)
+bool Engine::createWindow(int width, int height, const std::string& title) {
+
+	glWindow = OpenGLWindow(width, height, title);
+	return glWindow.init();
+}
+
+void Engine::removeWindow() {
+	glWindow.cleanup();
+}
+
 // Game cycle running
 void Engine::run(bool useOpenGLRenderer, bool use_DDA_render) {
 
-	system("cls");			// clear window before game drawing
-
-	
 	// init choosen renderer (gl, console)
-	if (useOpenGLRenderer)
+	if (useOpenGLRenderer) {
+		
+		if (!getGLWindowStatus()) {
+			std::cerr << "[Error] Use createWindow() before game-loop running with GL renderer\n";
+			return;
+		}
+
+		glWindow.setVSync(true);
 		renderer = std::make_unique<GLRenderer>(glWindow);
-	else 
+	}
+	else {
 		renderer = std::make_unique<ConsoleRenderer>();
 
+		system("cls");	// clear window before game drawing (console only)
+	}
 
 	auto lastTime = std::chrono::high_resolution_clock::now();
-	
 	isRunning = true;
+	
 	while (isRunning) {
+
+		// every loop start check if window should be closed and process events for best impact
+		if (useOpenGLRenderer) {
+			if (glWindow.shouldClose()) break; // not isRunning = false to return immediately
+
+			glWindow.pollEvents(); // event processing
+		}
+
 
 		// compute deltaTime value
 		auto currentTime = std::chrono::high_resolution_clock::now();
@@ -38,13 +64,16 @@ void Engine::run(bool useOpenGLRenderer, bool use_DDA_render) {
 		// scene rendering with choosen mode
 		renderer->render(generator.getMap(), playerCoord, playerAngle, use_DDA_render);
 
-		auto frameEndTime = std::chrono::high_resolution_clock::now();
-		auto frameTime = std::chrono::duration<float>(frameEndTime - currentTime).count();
+		// sleep time with delay to stabilize frames (~FPS) - actual only for console renderer
+		// GL uses VSync instead
+		if (!useOpenGLRenderer) {
+			auto frameEndTime = std::chrono::high_resolution_clock::now();
+			auto frameTime = std::chrono::duration<float>(frameEndTime - currentTime).count();
 
-		// sleep time with delay to stabilize frames (~FPS)
-		if (frameTime < FRAME_TIME) {
-			int sleepingMs = static_cast<int>((FRAME_TIME - frameTime) * 1000.0f);
-			Sleep(sleepingMs);
+			if (frameTime < FRAME_TIME) {
+				int sleepingMs = static_cast<int>((FRAME_TIME - frameTime) * 1000.0f);
+				Sleep(sleepingMs);
+			}
 		}
 	}
 }
