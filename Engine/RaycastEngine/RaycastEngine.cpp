@@ -94,20 +94,20 @@ float RaycastEngine::castRay_dda(const std::vector<std::vector<char>>& map, cons
 
 	if (rayDirection.x < 0.0f) {
 		stepCoord.x = -1;
-		sideDistance.x = rayCoord.x - mapCoord.x * deltaDistance.x;
+		sideDistance.x = (rayCoord.x - mapCoord.x) * deltaDistance.x;
 	}
 	else {
 		stepCoord.x = 1;
-		sideDistance.x = mapCoord.x + 1 - rayCoord.x * deltaDistance.x;
+		sideDistance.x = (mapCoord.x + 1 - rayCoord.x) * deltaDistance.x;
 	}
 
 	if (rayDirection.y < 0.0f) {
 		stepCoord.y = -1;
-		sideDistance.y = rayCoord.y - mapCoord.y * deltaDistance.y;
+		sideDistance.y = (rayCoord.y - mapCoord.y) * deltaDistance.y;
 	}
 	else {
 		stepCoord.y = 1;
-		sideDistance.y = mapCoord.y + 1 - rayCoord.y * deltaDistance.y;
+		sideDistance.y = (mapCoord.y + 1 - rayCoord.y) * deltaDistance.y;
 	}
 
 	bool isWallHit = false;
