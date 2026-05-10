@@ -13,7 +13,7 @@ class OpenGLWindow {
 	int height, width;
 	std::string windowTitle;
 
-	bool initialized;
+	bool isInitialized;
 
 	// glfw callbacks, needs to be inited
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -47,7 +47,7 @@ public:
 	GLFWwindow* getWindow() const { return window; }
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
-	bool getInitStatus() const { return initialized; }
+	bool getInitStatus() const { return isInitialized; }
 
 //setters
 

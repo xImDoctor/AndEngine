@@ -2,7 +2,7 @@
 
 
 OpenGLWindow::OpenGLWindow(int w, int h, const std::string& title) :
-	width(w), height(h), windowTitle(title), window(nullptr), initialized(false) {
+	width(w), height(h), windowTitle(title), window(nullptr), isInitialized(false) {
 }
 
 
@@ -48,7 +48,9 @@ bool OpenGLWindow::init() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "[Error] Failed to init GLAD\n";
 		glfwTerminate();
-		return false;
+
+		isInitialized = false;
+		return isInitialized;
 	}
 	std::cout << "[Success] GLAD is initialized\n";
 
@@ -59,7 +61,8 @@ bool OpenGLWindow::init() {
 	// Set callbacks to change window size
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-	return true;
+	isInitialized = true;
+	return isInitialized;
 }
 
 
